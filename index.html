@@ -122,7 +122,9 @@
     }
     .btn-fine { background: var(--accent-red); color: #fff; }
     .btn-reset { background: #3498db; color: #fff; }
+    .btn-reward { background: #9b59b6; color: #fff; }
     .btn-delete { background: #c0392b; color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
+    .btn-edit { background: #f39c12; color: #000; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; cursor: pointer; margin-right: 4px; }
 
     .section-title {
       color: var(--gold); padding-bottom: 6px; margin: 16px 0 10px;
@@ -134,9 +136,10 @@
       margin-bottom: 10px; border: 1px solid var(--gold-border);
     }
 
-    .task-tags { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .task-tags { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
     .tag-who { background: #332215; color: #f39c12; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
     .tag-type { background: #1a2e3b; color: #3498db; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
+    .tag-author { background: #2c1a32; color: #d35400; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
     .tag-fine { background: #4a1515; color: #ff6b6b; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
 
     .task-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
@@ -203,6 +206,10 @@
       background: #181410; border: 1px solid var(--gold-border);
       border-radius: 10px; padding: 10px; margin-bottom: 10px;
     }
+    .special-reward-card {
+      background: #21152b; border: 1px solid #9b59b6;
+      border-radius: 10px; padding: 10px; margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -219,7 +226,7 @@
 
     <div class="profile-dropdown" id="profile-dropdown">
       <div class="profile-option" onclick="chooseProfile('Saruman')">🧙‍♂️ Saruman</div>
-      <div class="profile-option" onclick="chooseProfile('Galadriel')">🧝‍♀️️ Galadriel</div>
+      <div class="profile-option" onclick="chooseProfile('Galadriel')">🧝‍♀️ Galadriel</div>
       <div class="profile-option" onclick="chooseProfile('Hobit Ady')">ᛓ Hobit Ady</div>
       <div class="profile-option" onclick="chooseProfile('Hobit Vydra')">🦦 Hobit Vydra</div>
       <div class="profile-option" style="color:var(--gold);" onclick="openPinConfig()">🔑 Změna PINů</div>
@@ -253,7 +260,7 @@
   <div id="page-council" class="page-section">
     <div class="section-title"><span>⚖️ ROKLINKA - PORADNÍ SÍŇ</span></div>
 
-    <button class="btn-action btn-fine" id="btn-add-fine" onclick="openFineModal()">⚠️️ UDĚLIT OKAMŽITOU POKUTU</button>
+    <button class="btn-action btn-fine" id="btn-add-fine" onclick="openFineModal()">⚠ UDĚLIT OKAMŽITOU POKUTU</button>
 
     <div class="task-card">
       <div class="task-name" style="color:var(--accent-red); margin-bottom:8px;">⚠️ Registr Uložených Pokut</div>
@@ -268,7 +275,7 @@
 
   <!-- MORIA -->
   <div id="page-treasury" class="page-section">
-    <div class="section-title"><span>💰 MORIA - POKLADNICE KRAJE</span></div>
+    <div class="section-title"><span>💰 MORIA - POKLADNICE & ODMĚNY</span></div>
     
     <button class="btn-action btn-reset" id="btn-reset-score" onclick="resetWeeklyScore()">🔄 VYNULOVAT SKÓRE PO TÝDNU A ULOŽIT</button>
 
@@ -282,6 +289,12 @@
         <span class="task-reward"><span id="treasury-vydra">0</span> Kč</span>
       </div>
     </div>
+
+    <div class="section-title">
+      <span>🎁 SPECIÁLNÍ ODMĚNY</span>
+      <button class="btn-action btn-reward" id="btn-add-special-reward" style="width:auto; margin:0; padding:4px 8px; font-size:0.75rem;" onclick="openSpecialRewardModal()">+ PŘIDAT ODMĚNU</button>
+    </div>
+    <div id="special-rewards-container"></div>
   </div>
 
   <!-- KRONIKA -->
@@ -387,6 +400,21 @@
     </div>
   </div>
 
+  <!-- SPECIAL REWARD MODAL -->
+  <div class="modal-overlay" id="modal-special-reward">
+    <div class="modal-card">
+      <div class="modal-title" id="special-reward-title" style="color:#9b59b6;">Přidat Speciální Odměnu</div>
+      <input type="hidden" id="special-reward-id">
+      <input type="text" class="modal-input" id="special-reward-name" placeholder="Název odměny (např. Kino, Lístek)">
+      <input type="text" class="modal-input" id="special-reward-desc" placeholder="Popis">
+      <input type="number" class="modal-input" id="special-reward-cost" placeholder="Cena v Kč / Zlatkách">
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal-cancel" onclick="closeSpecialRewardModal()">Zrušit</button>
+        <button class="btn-modal btn-modal-save" style="background:#9b59b6; color:#fff;" onclick="saveSpecialReward()">Uložit Odměnu</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCCQjpUXAuZi08D96BX0JKAuGNE4E3xq0Q",
@@ -402,10 +430,14 @@
       pins: { 'Saruman': '1234', 'Galadriel': '1234', 'Hobit Ady': '1111', 'Hobit Vydra': '2222' },
       finesLog: [],
       chronicle: [],
+      specialRewards: [
+        { id: 101, name: "VSTUPENKA DO KINA", desc: "Lístek na film dle vlastního výběru", cost: 150 },
+        { id: 102, name: "DEN BEZ DOMÁCÍCH PRACÍ", desc: "Jednodenní žolík na neplnění povinností", cost: 200 }
+      ],
       tasks: [
-        { id: 1, name: "ÚKLID HOBITÍ NORY & STOLU", desc: "Každé ráno před druhou snídaní.", reward: 20, fine: 5, type: 'repeat', who: "Oba Hobiti", doneAdy: false, doneVydra: false, confirmedAdy: false, confirmedVydra: false, lastReset: Date.now() },
-        { id: 2, name: "KRMENÍ VRCÁKŮ A MAZLÍČKŮ", desc: "Pravidelný denní rituál v Kraji.", reward: 15, fine: 10, type: 'repeat', who: "Hobit Ady", doneAdy: false, doneVydra: false, confirmedAdy: false, confirmedVydra: false, lastReset: Date.now() },
-        { id: 3, name: "MYTÍ NÁDOBÍ Z ELFÍ HOSTINY", desc: "Umyvatelné misky a číše.", reward: 25, fine: 0, type: 'repeat', who: "Hobit Vydra", doneAdy: false, doneVydra: false, confirmedAdy: false, confirmedVydra: false, lastReset: Date.now() }
+        { id: 1, name: "ÚKLID HOBITÍ NORY & STOLU", desc: "Každé ráno před druhou snídaní.", reward: 20, fine: 5, type: 'repeat', who: "Oba Hobiti", author: "🧙‍♂️ Saruman", doneAdy: false, doneVydra: false, confirmedAdy: false, confirmedVydra: false, lastReset: Date.now() },
+        { id: 2, name: "KRMENÍ VRCÁKŮ A MAZLÍČKŮ", desc: "Pravidelný denní rituál v Kraji.", reward: 15, fine: 10, type: 'repeat', who: "Hobit Ady", author: "🧝‍♀️ Galadriel", doneAdy: false, doneVydra: false, confirmedAdy: false, confirmedVydra: false, lastReset: Date.now() },
+        { id: 3, name: "MYTÍ NÁDOBÍ Z ELFÍ HOSTINY", desc: "Umyvatelné misky a číše.", reward: 25, fine: 0, type: 'repeat', who: "Hobit Vydra", author: "🧙‍♂️ Saruman", doneAdy: false, doneVydra: false, confirmedAdy: false, confirmedVydra: false, lastReset: Date.now() }
       ]
     };
 
@@ -413,6 +445,14 @@
     let currentProfile = 'Saruman';
     let targetProfile = null;
     let dbRef = null;
+
+    function getProfileIcon(name) {
+      if (name.includes('Saruman')) return '🧙‍♂️';
+      if (name.includes('Galadriel')) return '🧝‍♀️';
+      if (name.includes('Ady')) return 'ᛓ';
+      if (name.includes('Vydra')) return '🦦';
+      return '📜';
+    }
 
     function isRuler() {
       return currentProfile === 'Saruman' || currentProfile === 'Galadriel';
@@ -437,7 +477,8 @@
       const currentPins = familyData.pins || { 'Saruman': '1234', 'Galadriel': '1234', 'Hobit Ady': '1111', 'Hobit Vydra': '2222' };
       if (pin === currentPins[targetProfile]) {
         currentProfile = targetProfile;
-        document.getElementById('btn-profile').innerText = currentProfile + ' ∨';
+        const icon = getProfileIcon(currentProfile);
+        document.getElementById('btn-profile').innerText = icon + ' ' + currentProfile.toUpperCase() + ' ∨';
         document.getElementById('current-profile-name').innerText = currentProfile.toUpperCase();
         
         const ruler = isRuler();
@@ -445,6 +486,7 @@
         document.getElementById('btn-add-quest').style.display = ruler ? 'block' : 'none';
         document.getElementById('btn-add-fine').style.display = ruler ? 'block' : 'none';
         document.getElementById('btn-reset-score').style.display = ruler ? 'block' : 'none';
+        document.getElementById('btn-add-special-reward').style.display = ruler ? 'block' : 'none';
 
         closePinModal();
         render();
@@ -512,6 +554,24 @@
       render();
     }
 
+    function cancelFine(id) {
+      if (!isRuler()) return alert('Pouze vládci mohou zrušit pokutu!');
+      const fine = (familyData.finesLog || []).find(f => f.id === id);
+      if (!fine) return;
+
+      if (confirm(`Opravdu chcete zrušit tuto pokutu (${fine.amount} Kč) a vrátit zlatky hobitovi ${fine.who}?`)) {
+        if (fine.who === 'Hobit Ady') {
+          familyData.adyGolds = (familyData.adyGolds || 0) + fine.amount;
+        } else {
+          familyData.vydraGolds = (familyData.vydraGolds || 0) + fine.amount;
+        }
+
+        familyData.finesLog = familyData.finesLog.filter(f => f.id !== id);
+        if (dbRef) dbRef.update({ adyGolds: familyData.adyGolds, vydraGolds: familyData.vydraGolds, finesLog: familyData.finesLog }).catch(() => {});
+        render();
+      }
+    }
+
     function resetWeeklyScore() {
       if (!isRuler()) return alert('Pouze vládci mohou vynulovat skóre!');
       if (confirm('Opravdu chcete ukončit týden, uložit bilanci do Kroniky a vynulovat zlatky?')) {
@@ -576,6 +636,7 @@
         fine: parseInt(document.getElementById('new-fine').value) || 0,
         type: document.getElementById('new-type').value,
         who: document.getElementById('new-who').value,
+        author: getProfileIcon(currentProfile) + ' ' + currentProfile,
         doneAdy: false, doneVydra: false,
         confirmedAdy: false, confirmedVydra: false,
         lastReset: Date.now()
@@ -584,6 +645,60 @@
       if (dbRef) dbRef.update({ tasks: familyData.tasks }).catch(() => {});
       closeAddModal();
       render();
+    }
+
+    /* SPECIÁLNÍ ODMĚNY */
+    function openSpecialRewardModal(id = null) {
+      if (!isRuler()) return alert('Pouze vládci mohou spravovat speciální odměny!');
+      document.getElementById('special-reward-id').value = id || '';
+      if (id) {
+        const item = (familyData.specialRewards || []).find(r => r.id === id);
+        if (item) {
+          document.getElementById('special-reward-title').innerText = 'Upravit Speciální Odměnu';
+          document.getElementById('special-reward-name').value = item.name;
+          document.getElementById('special-reward-desc').value = item.desc;
+          document.getElementById('special-reward-cost').value = item.cost;
+        }
+      } else {
+        document.getElementById('special-reward-title').innerText = 'Přidat Speciální Odměnu';
+        document.getElementById('special-reward-name').value = '';
+        document.getElementById('special-reward-desc').value = '';
+        document.getElementById('special-reward-cost').value = '';
+      }
+      document.getElementById('modal-special-reward').classList.add('open');
+    }
+
+    function closeSpecialRewardModal() {
+      document.getElementById('modal-special-reward').classList.remove('open');
+    }
+
+    function saveSpecialReward() {
+      const id = document.getElementById('special-reward-id').value;
+      const name = document.getElementById('special-reward-name').value;
+      const desc = document.getElementById('special-reward-desc').value || '';
+      const cost = parseInt(document.getElementById('special-reward-cost').value) || 0;
+
+      if (!name) return alert('Zadejte název odměny!');
+      if (!familyData.specialRewards) familyData.specialRewards = [];
+
+      if (id) {
+        familyData.specialRewards = familyData.specialRewards.map(r => r.id == id ? { id: parseInt(id), name, desc, cost } : r);
+      } else {
+        familyData.specialRewards.push({ id: Date.now(), name, desc, cost });
+      }
+
+      if (dbRef) dbRef.update({ specialRewards: familyData.specialRewards }).catch(() => {});
+      closeSpecialRewardModal();
+      render();
+    }
+
+    function deleteSpecialReward(id) {
+      if (!isRuler()) return alert('Pouze vládci mohou mazat odměny!');
+      if (confirm('Opravdu chcete tuto speciální odměnu smazat?')) {
+        familyData.specialRewards = familyData.specialRewards.filter(r => r.id !== id);
+        if (dbRef) dbRef.update({ specialRewards: familyData.specialRewards }).catch(() => {});
+        render();
+      }
     }
 
     function setFilter(f, btn) {
@@ -689,6 +804,7 @@
       document.getElementById("tasks-container").innerHTML = visibleQuests.map(t => {
         const canClickAdy = (isRuler() || currentProfile === 'Hobit Ady') && !t.confirmedAdy;
         const canClickVydra = (isRuler() || currentProfile === 'Hobit Vydra') && !t.confirmedVydra;
+        const authorTag = t.author || '🧙‍♂️ Saruman';
 
         return `
           <div class="task-card">
@@ -696,6 +812,7 @@
               <div>
                 <span class="tag-who">${t.who}</span>
                 <span class="tag-type">${t.type === 'once' ? 'Jednorázový' : 'Opakovaný'}</span>
+                <span class="tag-author">${authorTag}</span>
                 ${t.fine ? `<span class="tag-fine">Pokuta ${t.fine} Kč</span>` : ''}
               </div>
               ${isRuler() ? `<button class="btn-delete" onclick="deleteTask(${t.id})">🗑️ SMAZAT</button>` : ''}
@@ -740,11 +857,11 @@
         } else {
           finesContainer.innerHTML = fines.map(f => `
             <div class="fine-log-item">
-              <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                <span style="color:#ff6b6b;">${f.who}</span>
-                <span style="color:#ff6b6b;">-${f.amount} Kč</span>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:#ff6b6b; font-weight:bold;">${f.who} (-${f.amount} Kč)</span>
+                ${isRuler() ? `<button class="btn-delete" onclick="cancelFine(${f.id})">🗑️️ ZRUŠIT</button>` : ''}
               </div>
-              <div style="color:#ccc; font-size:0.75rem; margin-top:2px;">${f.reason} (${f.date})</div>
+              <div style="color:#ccc; font-size:0.75rem; margin-top:4px;">${f.reason} (${f.date})</div>
             </div>
           `).join('');
         }
@@ -772,6 +889,33 @@
             </div>
           `;
         }).join('');
+      }
+
+      // Speciální Odměny v Morii
+      const specialRewardsContainer = document.getElementById("special-rewards-container");
+      if (specialRewardsContainer) {
+        const srList = familyData.specialRewards || [];
+        if (srList.length === 0) {
+          specialRewardsContainer.innerHTML = '<div class="task-card" style="color:#888;">Zatím nebyly přidány žádné speciální odměny.</div>';
+        } else {
+          specialRewardsContainer.innerHTML = srList.map(r => `
+            <div class="special-reward-card">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <div style="font-weight:bold; color:#fff; font-size:0.95rem;">${r.name}</div>
+                  <div style="font-size:0.8rem; color:#aaa; margin-top:2px;">${r.desc}</div>
+                </div>
+                <div class="task-reward" style="border-color:#9b59b6; color:#9b59b6; background:rgba(155, 89, 182, 0.15);">${r.cost} Kč</div>
+              </div>
+              ${isRuler() ? `
+                <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+                  <button class="btn-edit" onclick="openSpecialRewardModal(${r.id})">✏️️ UPRAVIT</button>
+                  <button class="btn-delete" onclick="deleteSpecialReward(${r.id})">🗑️ SMAZAT</button>
+                </div>
+              ` : ''}
+            </div>
+          `).join('');
+        }
       }
 
       // Kronika
