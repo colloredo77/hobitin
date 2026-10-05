@@ -54,7 +54,7 @@
       color: #000; font-weight: bold; font-size: 1.2rem;
     }
 
-    .header-title h1 { font-size: 1.1rem; font-weight: 900; color: #fff; }
+    .header-title h1 { font-size: 1rem; font-weight: 900; color: #fff; }
     .header-status { font-size: 0.72rem; color: #a0a0a0; display: flex; align-items: center; gap: 4px; }
     .status-dot { width: 8px; height: 8px; background: #e74c3c; border-radius: 50%; display: inline-block; }
     .status-dot.online { background: #2ecc71; }
@@ -164,7 +164,7 @@
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: #0d0a08; border-top: 1.5px solid var(--gold);
-      padding: 10px 14px; display: flex; justify-around; z-index: 100;
+      padding: 10px 14px; display: flex; justify-content: space-around; z-index: 100;
     }
 
     .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
@@ -200,7 +200,7 @@
       <div class="header-logo-icon">💰</div>
       <div class="header-title">
         <h1>LEGENDA O KAPESNÉM</h1>
-        <div class="header-status"><span id="status-dot" class="status-dot"></span> <span id="db-status-text">Načítání...</span></div>
+        <div class="header-status"><span id="status-dot" class="status-dot"></span> <span id="db-status-text">Připojování...</span></div>
       </div>
     </div>
     <button class="btn-profile-select" id="btn-profile" onclick="toggleMenu()">🧙‍♂️ SARUMAN ∨</button>
@@ -359,8 +359,7 @@
     }
 
     function toggleMenu() {
-      const el = document.getElementById('profile-dropdown');
-      el.classList.toggle('open');
+      document.getElementById('profile-dropdown').classList.toggle('open');
     }
 
     function chooseProfile(name) {
@@ -401,7 +400,6 @@
     function applyFine() {
       const who = document.getElementById('fine-who').value;
       const amount = parseInt(document.getElementById('fine-amount').value) || 0;
-      const reason = document.getElementById('fine-reason').value || 'Pokuta';
 
       if (amount <= 0) return alert('Zadejte částku pokuty!');
 
@@ -411,7 +409,7 @@
         familyData.vydraGolds = Math.max(0, (familyData.vydraGolds || 0) - amount);
       }
 
-      if (dbRef) dbRef.update({ adyGolds: familyData.adyGolds, vydraGolds: familyData.vydraGolds });
+      if (dbRef) dbRef.update({ adyGolds: familyData.adyGolds, vydraGolds: familyData.vydraGolds }).catch(() => {});
       closeFineModal();
       render();
     }
@@ -431,7 +429,7 @@
         doneAdy: false, doneVydra: false
       });
 
-      if (dbRef) dbRef.update({ tasks: familyData.tasks });
+      if (dbRef) dbRef.update({ tasks: familyData.tasks }).catch(() => {});
       closeAddModal();
       render();
     }
@@ -461,7 +459,7 @@
         }
         return t;
       });
-      if (dbRef) dbRef.update({ tasks: familyData.tasks });
+      if (dbRef) dbRef.update({ tasks: familyData.tasks }).catch(() => {});
       render();
     }
 
@@ -482,7 +480,8 @@
         return `
           <div class="task-card">
             <div class="task-tags">
-              <span class="tag-who">${t.who}</span>${t.fine ? `<span class="tag-fine">Pokuta ${t.fine} Kč</span>` : ''}
+              <span class="tag-who">${t.who}</span>
+              ${t.fine ? `<span class="tag-fine">Pokuta ${t.fine} Kč</span>` : ''}
             </div>
             <div class="task-header">
               <div>
@@ -518,4 +517,47 @@
       const councilContainer = document.getElementById("council-status-container");
       if (councilContainer) {
         councilContainer.innerHTML = (familyData.tasks || []).map(t => `
-          <div
+          <div style="border-bottom: 1px dashed rgba(243,156,18,0.2); padding: 8px 0; font-size: 0.85rem;">
+            <div style="font-weight:bold; color:#fff;">${t.name}</div>
+            <div style="display:flex; justify-content:space-between; margin-top:4px;">
+              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Ady') ? `<span>ᛓ Ady: <strong style="color:${t.doneAdy?'#2ecc71':'#ff6b6b'}">${t.doneAdy?'SPLNĚNO':'ČEKÁ'}</strong></span>` : ''}
+              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra') ? `<span>🦦 Vydra: <strong style="color:${t.doneVydra?'#2ecc71':'#ff6b6b'}">${t.doneVydra?'SPLNĚNO':'ČEKÁ'}</strong></span>` : ''}
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Okamžité vykreslení
+    render();
+
+    // Načtení databáze na pozadí bez zablokování GUI
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        firebase.auth().signInAnonymously().then(() => {
+          document.getElementById("db-status-text").innerText = "Živě v cloudu";
+          document.getElementById("status-dot").classList.add("online");
+          dbRef = db.collection("families").doc("hlavni_rodina");
+          dbRef.onSnapshot(snap => {
+            if (snap.exists) { 
+              familyData = snap.data(); 
+              render(); 
+            } else { 
+              dbRef.set(familyData); 
+            }
+          }, () => {
+            document.getElementById("db-status-text").innerText = "Lokální režim";
+          });
+        }).catch(() => { 
+          document.getElementById("db-status-text").innerText = "Lokální režim"; 
+        });
+      } catch(e) { 
+        document.getElementById("db-status-text").innerText = "Lokální režim"; 
+      }
+    });
+  </script>
+
+</body>
+</html>
