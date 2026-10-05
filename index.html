@@ -1,1279 +1,191 @@
 <!DOCTYPE html>
-<html lang="cs" class="dark">
+<html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Středozem: Úkoly & Pokladnice Hobitů</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        cinzel: ['Cinzel', 'serif'],
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        ring: {
-                            500: '#f59e0b',
-                            600: '#d97706',
-                            700: '#b45309',
-                        },
-                        mordor: {
-                            800: '#1c1917',
-                            900: '#0c0a09',
-                        }
-                    }
-                }
-            }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legenda o Kapesném</title>
+  <style>
+    :root {
+      --gold: #d4af37;
+      --gold-dark: #aa7c11;
+      --bg-dark: #12100e;
+      --card-bg: #1c1815;
+      --text-light: #f3ebd7;
+      --accent-red: #8b0000;
+      --accent-green: #2e7d32;
+    }
+
+    * { box-sizing: border-box; user-select: none; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      margin: 0;
+      padding: 12px;
+      padding-bottom: 80px;
+    }
+
+    header {
+      text-align: center;
+      background: linear-gradient(135deg, #2c1d11, #4a321a);
+      color: var(--gold);
+      padding: 16px;
+      border-radius: 12px;
+      border: 2px solid var(--gold);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      margin-bottom: 16px;
+    }
+
+    header h1 { margin: 0; font-size: 1.6rem; letter-spacing: 1px; }
+
+    .role-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .role-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--gold-dark);
+      color: var(--text-light);
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.9rem;
+    }
+
+    .role-btn.active {
+      background: var(--gold-dark);
+      color: #000;
+      border-color: var(--gold);
+    }
+
+    .section-title {
+      color: var(--gold);
+      border-bottom: 1px solid var(--gold-dark);
+      padding-bottom: 4px;
+      margin: 16px 0 10px;
+      font-size: 1.1rem;
+    }
+
+    .task-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task-info { flex-grow: 1; }
+    .task-title { font-weight: bold; color: var(--text-light); }
+    .task-reward { font-size: 0.85rem; color: var(--gold); }
+
+    .btn-action {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-action.done { background: var(--accent-green); color: #fff; }
+
+    .status-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #0a0908;
+      border-top: 2px solid var(--gold);
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+      color: var(--gold);
+    }
+  </style>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCCQjpUXAuZi08D96BX0JKAuGNE4E3xq0Q",
+      authDomain: "hobiti-kapesne-2d8ae.firebaseapp.com",
+      projectId: "hobiti-kapesne-2d8ae",
+      storageBucket: "hobiti-kapesne-2d8ae.firebasestorage.app",
+      messagingSenderId: "6584046927",
+      appId: "1:6584046927:web:c13c1760d0d1997f4da13a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    signInAnonymously(auth).then(() => {
+      console.log("Přihlášeno k Firebase");
+      initSync();
+    }).catch(err => console.error(err));
+
+    function initSync() {
+      const docRef = doc(db, "families", "hlavni_rodina");
+      onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          renderData(docSnap.data());
+        } else {
+          const defaultData = {
+            adyGolds: 0,
+            vydraGolds: 0,
+            tasks: [
+              { id: 1, name: "Úklid pokoje", reward: 10, doneAdy: false, doneVydra: false }
+            ]
+          };
+          setDoc(docRef, defaultData);
         }
-    </script>
-    <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            -webkit-tap-highlight-color: transparent;
-            background-color: #090807;
-            background-image: radial-gradient(circle at 50% 0%, #291e10 0%, #090807 70%);
-        }
-        .font-fantasy { font-family: 'Cinzel', serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1c1917; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #b45309; border-radius: 4px; }
-        .gold-border {
-            border: 1px solid rgba(217, 119, 6, 0.35);
-            box-shadow: inset 0 0 15px rgba(217, 119, 6, 0.05);
-        }
-    </style>
+      });
+    }
+
+    function renderData(data) {
+      document.getElementById("ady-gold").innerText = data.adyGolds || 0;
+      document.getElementById("vydra-gold").innerText = data.vydraGolds || 0;
+    }
+  </script>
 </head>
-<body class="text-stone-200 min-h-screen flex flex-col items-center justify-start pb-12">
+<body>
 
-    <!-- MAIN CONTAINER -->
-    <div id="app" class="w-full max-w-md bg-stone-950 min-h-screen shadow-2xl flex flex-col justify-between relative border-x border-amber-900/40">
-        
-        <!-- HEADER -->
-        <header class="bg-stone-900/90 backdrop-blur border-b border-amber-800/40 text-stone-100 p-4 sticky top-0 z-30 shadow-lg">
-            <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center font-bold text-stone-950 text-lg shadow-md ring-2 ring-amber-400/50">
-                        <i class="fa-solid fa-ring"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-base font-fantasy font-bold tracking-wider text-amber-400 leading-tight">Legenda o Kapesném</h1>
-                        <span id="syncStatus" class="text-[11px] text-amber-200/70 flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Svitky synchronizovány
-                        </span>
-                    </div>
-                </div>
+  <header>
+    <h1>Legenda o Kapesném</h1>
+  </header>
 
-                <!-- PROFILE SWITCHER DROPDOWN -->
-                <div class="relative">
-                    <button id="profileBtn" onclick="toggleProfileMenu()" class="flex items-center space-x-2 bg-stone-800 hover:bg-stone-700 px-3 py-1.5 rounded-xl text-xs font-medium border border-amber-700/50 text-amber-200 transition">
-                        <span id="currentProfileRoleIcon"><i class="fa-solid fa-hat-wizard text-amber-400"></i></span>
-                        <span id="currentProfileName" class="max-w-[100px] truncate font-fantasy font-bold">Saruman</span>
-                        <i class="fa-solid fa-chevron-down text-[10px] text-amber-400/70"></i>
-                    </button>
+  <div class="role-selector">
+    <button class="role-btn active">🧙‍♂️ Saruman & Galadriel</button>
+    <button class="role-btn">ᛓ Hobit Ady (<span id="ady-gold">0</span> 💰)</button>
+    <button class="role-btn">🦦 Hobit Vydra (<span id="vydra-gold">0</span> 💰)</button>
+  </div>
 
-                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-60 bg-stone-900 rounded-2xl shadow-2xl border border-amber-700/60 py-2 text-stone-200 z-50 text-xs">
-                        <div class="px-3 py-1 text-[10px] font-bold text-amber-500 uppercase tracking-wider font-fantasy flex items-center justify-between">
-                            <span>Mágové & Vládci</span>
-                            <i class="fa-solid fa-lock text-amber-500"></i>
-                        </div>
-                        <button onclick="requestRoleSwitch('parent1')" class="w-full text-left px-4 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
-                            <span><i class="fa-solid fa-hat-wizard text-amber-400 mr-2"></i>Saruman</span>
-                            <span class="text-[10px] bg-amber-950 text-amber-400 border border-amber-700/50 px-1.5 py-0.5 rounded">PIN</span>
-                        </button>
-                        <button onclick="requestRoleSwitch('parent2')" class="w-full text-left px-4 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
-                            <span><i class="fa-solid fa-wand-magic-sparkles text-amber-300 mr-2"></i>Galadriel</span>
-                            <span class="text-[10px] bg-amber-950 text-amber-400 border border-amber-700/50 px-1.5 py-0.5 rounded">PIN</span>
-                        </button>
-                        
-                        <div class="border-t border-stone-800 my-1"></div>
-                        <div class="px-3 py-1 text-[10px] font-bold text-amber-500 uppercase tracking-wider font-fantasy">Hobiti z Kraje</div>
-                        <button onclick="requestRoleSwitch('kid1')" class="w-full text-left px-4 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
-                            <span><svg class="w-4 h-4 inline-block text-emerald-400 mr-2 fill-current align-sub" viewBox="0 0 24 24"><path d="M6 2v20h2.5v-7.5l7.5-5.5-7.5-2.5V2zm2.5 4.5l4.5 1.5-4.5 3V6.5zm0 8l4.5 3.3-4.5 1.7v-5z"/></svg><span id="labelKid1">Hobit Ady</span></span>
-                            <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-700/50 px-1.5 py-0.5 rounded">Volný</span>
-                        </button>
-                        <button onclick="requestRoleSwitch('kid2')" class="w-full text-left px-4 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
-                            <span><i class="fa-solid fa-feather-pointed text-cyan-400 mr-2"></i><span id="labelKid2">Hobit Vydra</span></span>
-                            <span class="text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-700/50 px-1.5 py-0.5 rounded">Volný</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+  <div class="section-title">Aktivní výpravy (Úkoly)</div>
 
-            <!-- Role Banner -->
-            <div id="roleBanner" class="bg-stone-950/80 rounded-xl px-3 py-1.5 text-xs flex items-center justify-between border border-amber-900/30">
-                <span class="text-stone-300">Aktivní profil: <strong id="roleBannerText" class="text-amber-400 font-fantasy">Saruman (Plná správa Středozemě)</strong></span>
-                <span id="roleBadge" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Editor</span>
-            </div>
-        </header>
-
-        <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-5">
-
-            <!-- TAB 1: Questy (Tasks) -->
-            <section id="tab-tasks" class="space-y-4">
-                
-                <!-- Filter Buttons -->
-                <div class="flex items-center justify-between bg-stone-900/90 p-1.5 rounded-xl text-xs font-semibold border border-amber-900/30">
-                    <button onclick="filterTasksByKid('all')" id="filter-all" class="filter-btn flex-1 py-1.5 rounded-lg bg-amber-600 text-stone-950 font-bold text-center transition">Všechny Questy</button>
-                    <button onclick="filterTasksByKid('kid1')" id="filter-kid1" class="filter-btn flex-1 py-1.5 rounded-lg text-stone-400 hover:text-stone-200 text-center transition"><span class="name-kid1">Hobit Ady</span></button>
-                    <button onclick="filterTasksByKid('kid2')" id="filter-kid2" class="filter-btn flex-1 py-1.5 rounded-lg text-stone-400 hover:text-stone-200 text-center transition"><span class="name-kid2">Hobit Vydra</span></button>
-                </div>
-
-                <!-- Daily Chores -->
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xs font-fantasy font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-2">
-                            <i class="fa-solid fa-scroll text-amber-500"></i> Denní Rituály & Povinnosti
-                        </h2>
-                        <span id="countDailyTasks" class="text-xs bg-stone-800 text-amber-300 border border-amber-700/40 px-2 py-0.5 rounded-full font-bold">0</span>
-                    </div>
-                    <div id="dailyTasksList" class="space-y-2.5">
-                        <!-- Dynamic render -->
-                    </div>
-                </div>
-
-                <!-- One-time Quests -->
-                <div class="pt-2">
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xs font-fantasy font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-2">
-                            <i class="fa-solid fa-dragon text-amber-500"></i> Mimořádné Questy
-                        </h2>
-                        <span id="countOnceTasks" class="text-xs bg-stone-800 text-amber-300 border border-amber-700/40 px-2 py-0.5 rounded-full font-bold">0</span>
-                    </div>
-                    <div id="onceTasksList" class="space-y-2.5">
-                        <!-- Dynamic render -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 2: Radní Síň (Approval Queue) -->
-            <section id="tab-approval" class="hidden space-y-4">
-                <div class="bg-amber-950/40 border border-amber-700/50 rounded-2xl p-3.5 flex items-start gap-3">
-                    <i class="fa-solid fa-shield-halved text-amber-400 text-xl mt-0.5"></i>
-                    <div class="text-xs text-amber-200/90 leading-relaxed">
-                        <strong class="text-amber-400 font-fantasy">Radní síň schvalování:</strong> Zde hobiti předkládají dokončené úkoly. Saruman či Galadriel je zkontrolují, udělí zlaťáky nebo vrátí k předělání!
-                    </div>
-                </div>
-
-                <div id="approvalList" class="space-y-3">
-                    <!-- Dynamic review items -->
-                </div>
-            </section>
-
-            <!-- TAB 3: Pokladnice & Týdenní Vyúčtování (Summary) -->
-            <section id="tab-summary" class="hidden space-y-4">
-                
-                <!-- Financial Cards for Hobits -->
-                <div class="grid grid-cols-2 gap-3">
-                    <!-- Hobit Ady Card -->
-                    <div class="bg-gradient-to-br from-stone-900 to-emerald-950 text-stone-100 p-4 rounded-2xl gold-border relative overflow-hidden">
-                        <div class="absolute -right-3 -bottom-3 opacity-15 text-7xl font-fantasy font-black text-emerald-400"><i class="fa-solid fa-coins"></i></div>
-                        <div class="text-xs font-semibold text-emerald-300 flex items-center justify-between">
-                            <span class="name-kid1 font-fantasy">Hobit Ady</span>
-                            <i class="fa-solid fa-sack-dollar text-emerald-400"></i>
-                        </div>
-                        <div id="kid1Balance" class="text-2xl font-black font-fantasy text-amber-300 mt-2 mb-1">0 Zlaťáků</div>
-                        <div class="text-[11px] text-stone-400 flex justify-between pt-2 border-t border-emerald-900/50">
-                            <span>Zlaťáky: <strong id="kid1Rewards" class="text-emerald-400">+0</strong></span>
-                            <span>Pokuty: <strong id="kid1Fines" class="text-rose-400">-0</strong></span>
-                        </div>
-                    </div>
-
-                    <!-- Hobit Vydra Card -->
-                    <div class="bg-gradient-to-br from-stone-900 to-cyan-950 text-stone-100 p-4 rounded-2xl gold-border relative overflow-hidden">
-                        <div class="absolute -right-3 -bottom-3 opacity-15 text-7xl font-fantasy font-black text-cyan-400"><i class="fa-solid fa-vault"></i></div>
-                        <div class="text-xs font-semibold text-cyan-300 flex items-center justify-between">
-                            <span class="name-kid2 font-fantasy">Hobit Vydra</span>
-                            <i class="fa-solid fa-sack-dollar text-cyan-400"></i>
-                        </div>
-                        <div id="kid2Balance" class="text-2xl font-black font-fantasy text-amber-300 mt-2 mb-1">0 Zlaťáků</div>
-                        <div class="text-[11px] text-stone-400 flex justify-between pt-2 border-t border-cyan-900/50">
-                            <span>Zlaťáky: <strong id="kid2Rewards" class="text-cyan-400">+0</strong></span>
-                            <span>Pokuty: <strong id="kid2Fines" class="text-rose-400">-0</strong></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Parents Actions Panel -->
-                <div id="parentFinanceControls" class="bg-stone-900/90 rounded-2xl p-4 space-y-3 gold-border">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-fantasy font-bold uppercase tracking-wider text-amber-400">Dekrety Vládců</h3>
-                        <span class="text-[10px] bg-amber-950 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded">Pouze Mágové</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="openManualTransactionModal()" class="w-full bg-stone-800 hover:bg-stone-700 text-amber-200 font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-amber-700/40">
-                            <i class="fa-solid fa-gavel text-amber-400"></i> Pokuta / Bonus
-                        </button>
-                        <button onclick="openWeeklyResetModal()" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md transition font-fantasy">
-                            <i class="fa-solid fa-coins"></i> Vynulovat Týden
-                        </button>
-                    </div>
-
-                    <div class="pt-2 border-t border-stone-800 flex justify-end">
-                        <button onclick="openChangePinModal()" class="text-[11px] text-amber-400/80 hover:text-amber-300 flex items-center gap-1">
-                            <i class="fa-solid fa-key"></i> Změnit rodičovský PIN
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Table Summary -->
-                <div class="bg-stone-900/90 border border-amber-900/40 rounded-2xl overflow-hidden shadow-sm">
-                    <div class="bg-stone-950 px-4 py-3 border-b border-amber-900/30 flex items-center justify-between">
-                        <h3 class="text-xs font-fantasy font-bold text-amber-400 uppercase tracking-wider">Svitek týdenních výsledků</h3>
-                        <span class="text-[11px] text-stone-400" id="currentWeekDate">Aktuální věk</span>
-                    </div>
-
-                    <div class divide-y divide-stone-800/80 text-xs">
-                        <div class="grid grid-cols-4 px-4 py-2 font-fantasy font-bold text-amber-500/80 text-[10px] uppercase">
-                            <span>Hobit</span>
-                            <span class="text-center">Questy</span>
-                            <span class="text-center">Pokuty</span>
-                            <span class="text-right">Truhla</span>
-                        </div>
-                        
-                        <!-- Hobit Ady Row -->
-                        <div class="grid grid-cols-4 px-4 py-3 items-center">
-                            <span class="font-bold text-stone-200 name-kid1">Hobit Ady</span>
-                            <span class="text-center text-emerald-400 font-semibold" id="tableKid1Done">0</span>
-                            <span class="text-center text-rose-400 font-semibold" id="tableKid1Fines">0 Kč</span>
-                            <span class="text-right font-extrabold text-amber-300 font-fantasy" id="tableKid1Total">0 Kč</span>
-                        </div>
-
-                        <!-- Hobit Vydra Row -->
-                        <div class="grid grid-cols-4 px-4 py-3 items-center">
-                            <span class="font-bold text-stone-200 name-kid2">Hobit Vydra</span>
-                            <span class="text-center text-cyan-400 font-semibold" id="tableKid2Done">0</span>
-                            <span class="text-center text-rose-400 font-semibold" id="tableKid2Fines">0 Kč</span>
-                            <span class="text-right font-extrabold text-amber-300 font-fantasy" id="tableKid2Total">0 Kč</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- History Log -->
-                <div class="space-y-2">
-                    <h3 class="text-xs font-fantasy font-bold text-amber-400/80 uppercase tracking-wider px-1">Kronika Středozemě</h3>
-                    <div id="historyLogs" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs custom-scrollbar">
-                        <!-- Render logs -->
-                    </div>
-                </div>
-
-            </section>
-
-        </main>
-
-        <!-- Floating Action Button for Parents (Add Quest) -->
-        <div id="fabContainer" class="fixed bottom-20 right-4 max-w-md w-full pointer-events-none flex justify-end pr-4 z-20">
-            <button onclick="openAddTaskModal()" class="pointer-events-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-black p-4 rounded-full shadow-xl flex items-center justify-center transition transform hover:scale-105 active:scale-95 border-2 border-amber-300">
-                <i class="fa-solid fa-plus text-xl"></i>
-            </button>
-        </div>
-
-        <!-- Navigation Bar (Bottom) -->
-        <nav class="bg-stone-900 border-t border-amber-800/40 px-2 py-2 sticky bottom-0 z-30 grid grid-cols-3 gap-1">
-            <button onclick="switchTab('tasks')" id="nav-tasks" class="nav-btn flex flex-col items-center justify-center py-1.5 text-amber-400 font-bold transition">
-                <i class="fa-solid fa-scroll text-lg mb-0.5"></i>
-                <span class="text-[11px] font-fantasy">Questy</span>
-            </button>
-            <button onclick="switchTab('approval')" id="nav-approval" class="nav-btn flex flex-col items-center justify-center py-1.5 text-stone-400 font-medium transition relative">
-                <i class="fa-solid fa-gavel text-lg mb-0.5"></i>
-                <span class="text-[11px] font-fantasy">Radní Síň</span>
-                <span id="approvalBadge" class="hidden absolute top-1 right-6 w-4 h-4 bg-amber-500 text-stone-950 rounded-full text-[9px] font-black flex items-center justify-center">0</span>
-            </button>
-            <button onclick="switchTab('summary')" id="nav-summary" class="nav-btn flex flex-col items-center justify-center py-1.5 text-stone-400 font-medium transition">
-                <i class="fa-solid fa-coins text-lg mb-0.5"></i>
-                <span class="text-[11px] font-fantasy">Pokladnice</span>
-            </button>
-        </nav>
-
+  <div class="task-card">
+    <div class="task-info">
+      <div class="task-title">Úklid pokoje</div>
+      <div class="task-reward">+10 Zlaťáků</div>
     </div>
+    <button class="btn-action">Odevzdat</button>
+  </div>
 
-    <!-- MODAL PIN: Verification for Parent Roles -->
-    <div id="modalPin" class="hidden fixed inset-0 bg-stone-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-stone-900 border border-amber-700/60 w-full max-w-xs rounded-2xl shadow-2xl p-5 space-y-4 text-center text-stone-200">
-            <div class="w-12 h-12 bg-amber-950 text-amber-400 border border-amber-700/50 rounded-full flex items-center justify-center mx-auto text-xl">
-                <i class="fa-solid fa-key"></i>
-            </div>
-            <div>
-                <h3 class="font-fantasy font-bold text-amber-400 text-base">Heslo Mága</h3>
-                <p class="text-xs text-stone-400 mt-1">Zadejte PIN pro vstup do rodičovské správy <span id="targetRoleName" class="font-bold text-amber-300"></span></p>
-            </div>
+  <div class="status-bar">
+    Propojeno s Firebase: hobiti-kapesne-2d8ae
+  </div>
 
-            <form onsubmit="verifyPin(event)" class="space-y-3">
-                <input type="password" id="inputPin" maxlength="6" autofocus placeholder="****" class="w-full text-center text-2xl tracking-widest font-mono py-2 bg-stone-950 border border-amber-800/60 rounded-xl focus:outline-none focus:border-amber-500 text-amber-300">
-                <p id="pinError" class="text-rose-400 text-xs hidden">Nesprávný PIN! Zkuste znovu.</p>
-                <div class="text-[10px] text-stone-500 italic">(Výchozí rodičovský PIN je 1234)</div>
-
-                <div class="flex gap-2 pt-2">
-                    <button type="button" onclick="closeModal('modalPin')" class="flex-1 bg-stone-800 text-stone-300 font-semibold py-2 rounded-xl text-xs">Zrušit</button>
-                    <button type="submit" class="flex-1 bg-amber-600 text-stone-950 font-bold py-2 rounded-xl text-xs hover:bg-amber-500 font-fantasy">Vstoupit</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: Change PIN -->
-    <div id="modalChangePin" class="hidden fixed inset-0 bg-stone-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-stone-900 border border-amber-700/60 w-full max-w-xs rounded-2xl shadow-2xl p-5 space-y-4 text-stone-200">
-            <div class="flex items-center justify-between border-b border-amber-900/40 pb-3">
-                <h3 class="font-fantasy font-bold text-amber-400 text-sm">Změnit Rodičovský PIN</h3>
-                <button onclick="closeModal('modalChangePin')" class="text-stone-400 hover:text-stone-200"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <form onsubmit="handleChangePin(event)" class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-amber-200/80 mb-1">Starý PIN</label>
-                    <input type="password" id="oldPin" required class="w-full text-center text-lg font-mono py-1.5 bg-stone-950 border border-amber-800/60 rounded-xl focus:outline-none focus:border-amber-500">
-                </div>
-                <div>
-                    <label class="block text-amber-200/80 mb-1">Nový PIN</label>
-                    <input type="password" id="newPin" required maxlength="6" class="w-full text-center text-lg font-mono py-1.5 bg-stone-950 border border-amber-800/60 rounded-xl focus:outline-none focus:border-amber-500">
-                </div>
-                <p id="changePinError" class="text-rose-400 text-xs hidden">Chybný stávající PIN.</p>
-
-                <div class="flex gap-2 pt-2">
-                    <button type="button" onclick="closeModal('modalChangePin')" class="flex-1 bg-stone-800 text-stone-300 font-semibold py-2 rounded-xl">Zrušit</button>
-                    <button type="submit" class="flex-1 bg-amber-600 text-stone-950 font-bold py-2 rounded-xl hover:bg-amber-500 font-fantasy">Uložit PIN</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL 1: Add/Edit Task Modal -->
-    <div id="modalTask" class="hidden fixed inset-0 bg-stone-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-stone-900 border border-amber-700/60 w-full max-w-sm rounded-2xl shadow-2xl p-5 space-y-4 text-stone-200">
-            <div class="flex items-center justify-between border-b border-amber-900/40 pb-3">
-                <h3 id="modalTaskTitle" class="font-fantasy font-bold text-amber-400 text-base">Zadat nový quest</h3>
-                <button onclick="closeModal('modalTask')" class="text-stone-400 hover:text-stone-200 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <form id="taskForm" onsubmit="handleSaveTask(event)" class="space-y-3 text-xs">
-                <input type="hidden" id="taskId">
-                
-                <div>
-                    <label class="block text-amber-200/80 font-semibold mb-1">Název questu *</label>
-                    <input type="text" id="taskName" required placeholder="Např. Úklid hobití nory, Krmení vrčáků" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-stone-200 text-sm">
-                </div>
-
-                <div>
-                    <label class="block text-amber-200/80 font-semibold mb-1">Určeno pro hobita *</label>
-                    <select id="taskAssignedTo" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-stone-200 text-sm">
-                        <option value="both">Oba hobiti (Společný výnos)</option>
-                        <option value="kid1" id="optionKid1">Hobit Ady</option>
-                        <option value="kid2" id="optionKid2">Hobit Vydra</option>
-                    </select>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-amber-200/80 font-semibold mb-1">Druh questu</label>
-                        <select id="taskType" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-stone-200 text-sm">
-                            <option value="daily">Denní rituál (Opakovat)</option>
-                            <option value="once">Jednorázový quest</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-amber-200/80 font-semibold mb-1">Odměna (Zlaťáky/Kč) *</label>
-                        <input type="number" id="taskReward" min="0" required value="20" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-sm font-bold text-amber-400">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-amber-200/80 font-semibold mb-1">Pokuta při nesplnění (Kč) <span class="text-stone-500 font-normal">(volitelné)</span></label>
-                    <input type="number" id="taskPenalty" min="0" value="0" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-rose-500 text-sm text-rose-400">
-                </div>
-
-                <div>
-                    <label class="block text-amber-200/80 font-semibold mb-1">Popis / Pokyny mága</label>
-                    <textarea id="taskDesc" rows="2" placeholder="Podrobnosti výpravy..." class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-xs text-stone-200"></textarea>
-                </div>
-
-                <div class="pt-2 flex gap-2">
-                    <button type="button" onclick="closeModal('modalTask')" class="flex-1 bg-stone-800 text-stone-300 font-semibold py-2.5 rounded-xl hover:bg-stone-700">Zrušit</button>
-                    <button type="submit" class="flex-1 bg-amber-600 text-stone-950 font-bold py-2.5 rounded-xl hover:bg-amber-500 shadow-md font-fantasy">Uložit Quest</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL 2: Manual Fine or Bonus -->
-    <div id="modalManualTx" class="hidden fixed inset-0 bg-stone-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-stone-900 border border-amber-700/60 w-full max-w-sm rounded-2xl shadow-2xl p-5 space-y-4 text-stone-200">
-            <div class="flex items-center justify-between border-b border-amber-900/40 pb-3">
-                <h3 class="font-fantasy font-bold text-amber-400 text-base">Dekret Vládce: Pokuta / Bonus</h3>
-                <button onclick="closeModal('modalManualTx')" class="text-stone-400 hover:text-stone-200 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <form id="manualTxForm" onsubmit="handleManualTx(event)" class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-amber-200/80 font-semibold mb-1">Vyberte hobita *</label>
-                    <select id="manualTxKid" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-stone-200 text-sm">
-                        <option value="kid1" class="name-kid1-option">Hobit Ady</option>
-                        <option value="kid2" class="name-kid2-option">Hobit Vydra</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-amber-200/80 font-semibold mb-1">Typ dekretu *</label>
-                    <select id="manualTxType" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-stone-200 text-sm">
-                        <option value="bonus">➕ Mimořádné zlaťáky (Bonus)</option>
-                        <option value="penalty">➖ Královská pokuta (Trest)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-amber-200/80 font-semibold mb-1">Počet Zlaťáků (Kč) *</label>
-                    <input type="number" id="manualTxAmount" min="1" required value="20" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-sm font-bold text-amber-400">
-                </div>
-
-                <div>
-                    <label class="block text-amber-200/80 font-semibold mb-1">Důvod dekretu *</label>
-                    <input type="text" id="manualTxReason" required placeholder="Např. Pomoc s hostinou, Neuklizená zbroj" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-sm text-stone-200">
-                </div>
-
-                <div class="pt-2 flex gap-2">
-                    <button type="button" onclick="closeModal('modalManualTx')" class="flex-1 bg-stone-800 text-stone-300 font-semibold py-2.5 rounded-xl">Zrušit</button>
-                    <button type="submit" class="flex-1 bg-amber-600 text-stone-950 font-bold py-2.5 rounded-xl hover:bg-amber-500 font-fantasy">Provést Dekret</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL 3: Weekly Reset Confirmation -->
-    <div id="modalWeeklyReset" class="hidden fixed inset-0 bg-stone-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-stone-900 border border-amber-700/60 w-full max-w-sm rounded-2xl shadow-2xl p-5 space-y-4 text-center text-stone-200">
-            <div class="w-12 h-12 bg-amber-950 text-amber-400 border border-amber-700/50 rounded-full flex items-center justify-center mx-auto text-xl">
-                <i class="fa-solid fa-coins"></i>
-            </div>
-            <div>
-                <h3 class="font-fantasy font-bold text-amber-400 text-base">Vyúčtování Truhly & Nový Věk</h3>
-                <p class="text-xs text-stone-400 mt-1">
-                    Vyplatíte hobitům zlaťáky v hotovosti a vynulujete bilanci questů pro nový týden?
-                </p>
-            </div>
-
-            <div class="bg-stone-950 p-3 rounded-xl text-left text-xs space-y-1.5 border border-amber-900/40">
-                <div class="flex justify-between">
-                    <span class="font-semibold text-stone-300 name-kid1">Hobit Ady:</span>
-                    <strong class="text-amber-400 font-fantasy" id="resetKid1Payout">0 Kč</strong>
-                </div>
-                <div class="flex justify-between">
-                    <span class="font-semibold text-stone-300 name-kid2">Hobit Vydra:</span>
-                    <strong class="text-amber-400 font-fantasy" id="resetKid2Payout">0 Kč</strong>
-                </div>
-            </div>
-
-            <div class="pt-2 flex gap-2">
-                <button onclick="closeModal('modalWeeklyReset')" class="flex-1 bg-stone-800 text-stone-300 font-semibold py-2.5 rounded-xl text-xs">Storno</button>
-                <button onclick="confirmWeeklyReset()" class="flex-1 bg-amber-600 text-stone-950 font-black py-2.5 rounded-xl hover:bg-amber-500 text-xs shadow-md font-fantasy">
-                    Vyplatit & Vynulovat
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase Config
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'domaci-prace-pan-prstenu';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {apiKey: "AIzaSyCCQjpUXAuZi08D96BX0JKAuGNE4E3xq0Q",
-  authDomain: "hobiti-kapesne-2d8ae.firebaseapp.com",
-  projectId: "hobiti-kapesne-2d8ae",
-  storageBucket: "hobiti-kapesne-2d8ae.firebasestorage.app",
-  messagingSenderId: "6584046927",
-  appId: "1:6584046927:web:c13c1760d0d1997f4da13a"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // App State
-        let currentUserRole = 'parent1'; // 'parent1' (Saruman), 'parent2' (Galadriel), 'kid1' (Hobit Ady), 'kid2' (Hobit Vydra)
-        let pendingRoleSwitch = null;
-        let currentTab = 'tasks';
-        let currentFilterKid = 'all';
-        let isOfflineMode = false;
-
-        let familyState = {
-            config: {
-                kid1Name: 'Hobit Ady',
-                kid2Name: 'Hobit Vydra',
-                parentPin: '1234'
-            },
-            chores: [],
-            logs: [],
-            balances: {
-                kid1: { rewards: 0, fines: 0, totalDone: 0 },
-                kid2: { rewards: 0, fines: 0, totalDone: 0 }
-            }
-        };
-
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    try {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } catch (tokenErr) {
-                        await signInAnonymously(auth);
-                    }
-                } else {
-                    await signInAnonymously(auth);
-                }
-                listenToFamilyData();
-            } catch (err) {
-                enableOfflineMode();
-            }
-        }
-
-        function getFamilyDocRef() {
-            return doc(db, 'artifacts', appId, 'public', 'data', 'family_app_data', 'main');
-        }
-
-        function enableOfflineMode() {
-            isOfflineMode = true;
-            const statusEl = document.getElementById('syncStatus');
-            if (statusEl) {
-                statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Lokální režim (Svitky uloženy)`;
-            }
-            const localData = localStorage.getItem('lotr_chores_data');
-            if (localData) {
-                try {
-                    familyState = JSON.parse(localData);
-                    if (!familyState.config.parentPin) familyState.config.parentPin = '1234';
-                } catch (e) {
-                    familyState = getInitialDefaultData();
-                }
-            } else {
-                familyState = getInitialDefaultData();
-                localStorage.setItem('lotr_chores_data', JSON.stringify(familyState));
-            }
-            updateUI();
-        }
-
-        function listenToFamilyData() {
-            try {
-                const docRef = getFamilyDocRef();
-                onSnapshot(docRef, (snapshot) => {
-                    if (snapshot.exists()) {
-                        const data = snapshot.data();
-                        familyState = {
-                            config: { parentPin: '1234', kid1Name: 'Hobit Ady', kid2Name: 'Hobit Vydra', ...data.config },
-                            chores: data.chores || [],
-                            logs: data.logs || [],
-                            balances: data.balances || {
-                                kid1: { rewards: 0, fines: 0, totalDone: 0 },
-                                kid2: { rewards: 0, fines: 0, totalDone: 0 }
-                            }
-                        };
-                    } else {
-                        saveFamilyStateToCloud(getInitialDefaultData());
-                    }
-                    updateUI();
-                }, (err) => {
-                    enableOfflineMode();
-                });
-            } catch (err) {
-                enableOfflineMode();
-            }
-        }
-
-        async function saveFamilyStateToCloud(newState) {
-            if (isOfflineMode) {
-                localStorage.setItem('lotr_chores_data', JSON.stringify(newState));
-                updateUI();
-                return;
-            }
-            try {
-                const docRef = getFamilyDocRef();
-                await setDoc(docRef, newState, { merge: true });
-            } catch (e) {
-                localStorage.setItem('lotr_chores_data', JSON.stringify(newState));
-                updateUI();
-            }
-        }
-
-        function getInitialDefaultData() {
-            return {
-                config: { kid1Name: 'Hobit Ady', kid2Name: 'Hobit Vydra', parentPin: '1234' },
-                balances: {
-                    kid1: { rewards: 0, fines: 0, totalDone: 0 },
-                    kid2: { rewards: 0, fines: 0, totalDone: 0 }
-                },
-                chores: [
-                    {
-                        id: 'quest-1',
-                        title: 'Úklid hobití nory & stolu',
-                        assignedTo: 'both',
-                        reward: 20,
-                        penalty: 5,
-                        type: 'daily',
-                        desc: 'Každé ráno před druhou snídaní.',
-                        completions: {}
-                    },
-                    {
-                        id: 'quest-2',
-                        title: 'Krmení vrčáků a mazlíčků',
-                        assignedTo: 'kid1',
-                        reward: 15,
-                        penalty: 10,
-                        type: 'daily',
-                        desc: 'Pravidelný denní rituál v Kraji.',
-                        completions: {}
-                    },
-                    {
-                        id: 'quest-3',
-                        title: 'Mytí nádobí z elfí hostiny',
-                        assignedTo: 'kid2',
-                        reward: 25,
-                        penalty: 0,
-                        type: 'daily',
-                        desc: 'Umyvatelné misky a číše.',
-                        completions: {}
-                    },
-                    {
-                        id: 'quest-4',
-                        title: 'Pomoc s nákupem v Hůrce',
-                        assignedTo: 'both',
-                        reward: 40,
-                        penalty: 0,
-                        type: 'once',
-                        desc: 'Mimořádná výprava pro zásoby.',
-                        completions: {}
-                    }
-                ],
-                logs: [
-                    {
-                        id: 'log-0',
-                        date: new Date().toLocaleDateString('cs-CZ'),
-                        text: 'Kronika Středozemě byla započata.',
-                        type: 'info'
-                    }
-                ]
-            };
-        }
-
-        // --- Role Switching & PIN Logic ---
-
-        window.requestRoleSwitch = function(targetRole) {
-            document.getElementById('profileDropdown').classList.add('hidden');
-            if (targetRole.startsWith('parent')) {
-                pendingRoleSwitch = targetRole;
-                const name = targetRole === 'parent1' ? 'Saruman' : 'Galadriel';
-                document.getElementById('targetRoleName').textContent = name;
-                document.getElementById('inputPin').value = '';
-                document.getElementById('pinError').classList.add('hidden');
-                document.getElementById('modalPin').classList.remove('hidden');
-            } else {
-                currentUserRole = targetRole;
-                updateUI();
-            }
-        };
-
-        window.verifyPin = function(e) {
-            e.preventDefault();
-            const entered = document.getElementById('inputPin').value;
-            const correctPin = familyState.config.parentPin || '1234';
-
-            if (entered === correctPin) {
-                currentUserRole = pendingRoleSwitch || 'parent1';
-                pendingRoleSwitch = null;
-                closeModal('modalPin');
-                updateUI();
-            } else {
-                document.getElementById('pinError').classList.remove('hidden');
-                document.getElementById('inputPin').value = '';
-            }
-        };
-
-        window.openChangePinModal = function() {
-            document.getElementById('oldPin').value = '';
-            document.getElementById('newPin').value = '';
-            document.getElementById('changePinError').classList.add('hidden');
-            document.getElementById('modalChangePin').classList.remove('hidden');
-        };
-
-        window.handleChangePin = function(e) {
-            e.preventDefault();
-            const oldP = document.getElementById('oldPin').value;
-            const newP = document.getElementById('newPin').value;
-            const currentPin = familyState.config.parentPin || '1234';
-
-            if (oldP !== currentPin) {
-                document.getElementById('changePinError').classList.remove('hidden');
-                return;
-            }
-
-            familyState.config.parentPin = newP;
-            addLog(`Rodičovské heslo (PIN) bylo úspěšně změněno.`, 'info');
-            saveFamilyStateToCloud(familyState);
-            closeModal('modalChangePin');
-        };
-
-        // --- Render UI ---
-        function updateUI() {
-            const k1Name = familyState.config.kid1Name || 'Hobit Ady';
-            const k2Name = familyState.config.kid2Name || 'Hobit Vydra';
-
-            document.querySelectorAll('.name-kid1').forEach(el => el.textContent = k1Name);
-            document.querySelectorAll('.name-kid2').forEach(el => el.textContent = k2Name);
-            document.getElementById('labelKid1').textContent = k1Name;
-            document.getElementById('labelKid2').textContent = k2Name;
-            document.getElementById('optionKid1').textContent = k1Name;
-            document.getElementById('optionKid2').textContent = k2Name;
-
-            const isParent = currentUserRole.startsWith('parent');
-            document.getElementById('roleBadge').textContent = isParent ? 'Editor' : 'Čtení';
-            document.getElementById('roleBadge').className = isParent 
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase' 
-                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase';
-
-            let roleName = 'Saruman';
-            let roleIcon = '<i class="fa-solid fa-hat-wizard text-amber-400"></i>';
-
-            if (currentUserRole === 'parent2') {
-                roleName = 'Galadriel';
-                roleIcon = '<i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>';
-            } else if (currentUserRole === 'kid1') {
-                roleName = k1Name;
-                roleIcon = '<svg class="w-5 h-5 inline-block text-emerald-400 fill-current" viewBox="0 0 24 24"><path d="M6 2v20h2.5v-7.5l7.5-5.5-7.5-2.5V2zm2.5 4.5l4.5 1.5-4.5 3V6.5zm0 8l4.5 3.3-4.5 1.7v-5z"/></svg>';
-            } else if (currentUserRole === 'kid2') {
-                roleName = k2Name;
-                roleIcon = '<i class="fa-solid fa-feather-pointed text-cyan-400"></i>';
-            }
-
-            document.getElementById('currentProfileRoleIcon').innerHTML = roleIcon;
-            document.getElementById('currentProfileName').textContent = roleName;
-            document.getElementById('roleBannerText').textContent = isParent ? `${roleName} (Vládce Středozemě)` : `${roleName} (Hobit z Kraje)`;
-
-            // FAB visibility
-            const fab = document.getElementById('fabContainer');
-            if (isParent && currentTab === 'tasks') {
-                fab.classList.remove('hidden');
-            } else {
-                fab.classList.add('hidden');
-            }
-
-            renderChores();
-            renderApprovals();
-            renderSummary();
-        }
-
-        function renderChores() {
-            const dailyList = document.getElementById('dailyTasksList');
-            const onceList = document.getElementById('onceTasksList');
-
-            dailyList.innerHTML = '';
-            onceList.innerHTML = '';
-
-            const isParent = currentUserRole.startsWith('parent');
-
-            let dailyCount = 0;
-            let onceCount = 0;
-
-            familyState.chores.forEach(chore => {
-                if (currentFilterKid !== 'all') {
-                    if (chore.assignedTo !== 'both' && chore.assignedTo !== currentFilterKid) {
-                        return;
-                    }
-                }
-
-                if (chore.type === 'daily') dailyCount++;
-                else onceCount++;
-
-                const card = createChoreCard(chore, isParent);
-                if (chore.type === 'daily') {
-                    dailyList.appendChild(card);
-                } else {
-                    onceList.appendChild(card);
-                }
-            });
-
-            document.getElementById('countDailyTasks').textContent = dailyCount;
-            document.getElementById('countOnceTasks').textContent = onceCount;
-
-            if (dailyCount === 0) {
-                dailyList.innerHTML = `<div class="text-center py-6 text-stone-500 text-xs italic bg-stone-900/60 rounded-xl border border-dashed border-stone-800">Žádné denní rituály v tomto zobrazení.</div>`;
-            }
-            if (onceCount === 0) {
-                onceList.innerHTML = `<div class="text-center py-6 text-stone-500 text-xs italic bg-stone-900/60 rounded-xl border border-dashed border-stone-800">Žádné mimořádné questy.</div>`;
-            }
-        }
-
-        function createChoreCard(chore, isParent) {
-            const div = document.createElement('div');
-            div.className = "bg-stone-900/90 border border-amber-900/30 rounded-2xl p-3.5 shadow-md space-y-2 relative transition hover:border-amber-700/50";
-
-            const k1Name = familyState.config.kid1Name || 'Hobit Ady';
-            const k2Name = familyState.config.kid2Name || 'Hobit Vydra';
-
-            let assignedText = "Oba Hobiti";
-            if (chore.assignedTo === 'kid1') assignedText = k1Name;
-            if (chore.assignedTo === 'kid2') assignedText = k2Name;
-
-            div.innerHTML = `
-                <div class="flex items-start justify-between">
-                    <div class="pr-2">
-                        <div class="flex items-center gap-1.5 mb-1">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${chore.assignedTo === 'both' ? 'bg-amber-950 text-amber-300 border border-amber-700/40' : 'bg-stone-800 text-stone-300'}">
-                                ${assignedText}
-                            </span>
-                            ${chore.penalty > 0 ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-rose-950 text-rose-300 border border-rose-800/40">Pokuta ${chore.penalty} Kč</span>` : ''}
-                        </div>
-                        <h3 class="font-fantasy font-bold text-amber-300 text-sm leading-snug">${chore.title}</h3>
-                        ${chore.desc ? `<p class="text-xs text-stone-400 mt-0.5">${chore.desc}</p>` : ''}
-                    </div>
-
-                    <div class="text-right flex flex-col items-end">
-                        <span class="text-xs font-fantasy font-extrabold text-amber-400 bg-amber-950/80 px-2.5 py-1 rounded-xl border border-amber-600/40 shadow-inner">
-                            +${chore.reward} Kč
-                        </span>
-                        ${isParent ? `
-                            <div class="flex items-center gap-2 mt-2">
-                                <button onclick="editTask('${chore.id}')" class="text-stone-400 hover:text-amber-400 text-xs p-1" title="Upravit"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteTask('${chore.id}')" class="text-stone-400 hover:text-rose-400 text-xs p-1" title="Smazat"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-
-                <div class="pt-2 border-t border-stone-800/80 flex flex-col gap-1.5">
-                    ${renderKidStatusButtons(chore)}
-                </div>
-            `;
-
-            return div;
-        }
-
-        function renderKidStatusButtons(chore) {
-            const isParent = currentUserRole.startsWith('parent');
-            const k1Name = familyState.config.kid1Name || 'Hobit Ady';
-            const k2Name = familyState.config.kid2Name || 'Hobit Vydra';
-
-            const targets = [];
-            if (chore.assignedTo === 'both') {
-                targets.push({ id: 'kid1', name: k1Name });
-                targets.push({ id: 'kid2', name: k2Name });
-            } else if (chore.assignedTo === 'kid1') {
-                targets.push({ id: 'kid1', name: k1Name });
-            } else {
-                targets.push({ id: 'kid2', name: k2Name });
-            }
-
-            return targets.map(target => {
-                const status = (chore.completions && chore.completions[target.id]) || 'pending';
-                const isCurrentKidTarget = (currentUserRole === target.id);
-
-                if (status === 'pending') {
-                    if (isCurrentKidTarget || isParent) {
-                        return `
-                            <div class="flex items-center justify-between text-xs py-1">
-                                <span class="font-semibold text-stone-300 font-fantasy">${target.name}:</span>
-                                <button onclick="submitTaskForReview('${chore.id}', '${target.id}')" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm font-fantasy">
-                                    <i class="fa-solid fa-check-double"></i> Splněno (Poslat)
-                                </button>
-                            </div>
-                        `;
-                    } else {
-                        return `
-                            <div class="flex items-center justify-between text-xs text-stone-500 py-0.5">
-                                <span class="font-fantasy">${target.name}:</span>
-                                <span class="italic text-[11px]">Čeká na splnění</span>
-                            </div>
-                        `;
-                    }
-                } else if (status === 'submitted') {
-                    return `
-                        <div class="flex items-center justify-between text-xs bg-amber-950/60 border border-amber-700/50 rounded-xl px-2.5 py-1.5">
-                            <span class="font-semibold text-amber-200">${target.name}: <span class="font-normal text-amber-300/80">Odesláno mágovi</span></span>
-                            <span class="text-[10px] bg-amber-900/80 text-amber-300 font-bold px-2 py-0.5 rounded-md border border-amber-600/30">Čeká na schválení</span>
-                        </div>
-                    `;
-                } else if (status === 'approved') {
-                    return `
-                        <div class="flex items-center justify-between text-xs bg-emerald-950/50 border border-emerald-800/40 rounded-xl px-2.5 py-1.5">
-                            <span class="font-semibold text-emerald-200">${target.name}: <span class="font-normal text-emerald-300/80">Quest Splněn!</span></span>
-                            <span class="text-[10px] bg-emerald-900/80 text-emerald-300 font-bold px-2 py-0.5 rounded-md border border-emerald-600/30"><i class="fa-solid fa-check"></i> Schváleno</span>
-                        </div>
-                    `;
-                }
-                return '';
-            }).join('');
-        }
-
-        function renderApprovals() {
-            const list = document.getElementById('approvalList');
-            list.innerHTML = '';
-
-            const pendingReviews = [];
-
-            const k1Name = familyState.config.kid1Name || 'Hobit Ady';
-            const k2Name = familyState.config.kid2Name || 'Hobit Vydra';
-
-            familyState.chores.forEach(chore => {
-                ['kid1', 'kid2'].forEach(kidKey => {
-                    if (chore.completions && chore.completions[kidKey] === 'submitted') {
-                        pendingReviews.push({
-                            chore,
-                            kidKey,
-                            kidName: kidKey === 'kid1' ? k1Name : k2Name
-                        });
-                    }
-                });
-            });
-
-            const badge = document.getElementById('approvalBadge');
-            if (pendingReviews.length > 0) {
-                badge.textContent = pendingReviews.length;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-
-            if (pendingReviews.length === 0) {
-                list.innerHTML = `
-                    <div class="text-center py-12 text-stone-500 text-xs space-y-2">
-                        <i class="fa-solid fa-shield-cat text-4xl text-stone-700"></i>
-                        <p>Žádné questy nečekají na schválení v Radní síni.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const isParent = currentUserRole.startsWith('parent');
-
-            pendingReviews.forEach(item => {
-                const div = document.createElement('div');
-                div.className = "bg-stone-900/90 border border-amber-700/60 rounded-2xl p-4 shadow-md space-y-3";
-                div.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded-md">
-                                Splnil hobit: ${item.kidName}
-                            </span>
-                            <h3 class="font-fantasy font-bold text-amber-300 text-sm mt-1.5">${item.chore.title}</h3>
-                            <p class="text-xs text-stone-400">Odměna za quest: <strong class="text-amber-400 font-fantasy">+${item.chore.reward} Zlaťáků</strong></p>
-                        </div>
-                    </div>
-
-                    ${isParent ? `
-                        <div class="flex gap-2 pt-1 border-t border-stone-800">
-                            <button onclick="rejectTask('${item.chore.id}', '${item.kidKey}')" class="flex-1 bg-stone-800 hover:bg-stone-700 text-rose-300 font-semibold py-2 rounded-xl text-xs flex items-center justify-center gap-1 border border-rose-900/40">
-                                <i class="fa-solid fa-xmark"></i> Vrátit quest
-                            </button>
-                            <button onclick="approveTask('${item.chore.id}', '${item.kidKey}')" class="flex-1 bg-amber-600 hover:bg-amber-500 text-stone-950 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1 shadow-md font-fantasy">
-                                <i class="fa-solid fa-check"></i> Schválit (+${item.chore.reward} Kč)
-                            </button>
-                        </div>
-                    ` : `
-                        <div class="text-xs text-amber-300/80 bg-amber-950/40 p-2 rounded-xl text-center italic border border-amber-900/30">
-                            Čeká na posouzení Sarumanem nebo Galadriel.
-                        </div>
-                    `}
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function renderSummary() {
-            const b = familyState.balances;
-            
-            document.getElementById('kid1Balance').textContent = `${(b.kid1.rewards - b.kid1.fines)} Kč`;
-            document.getElementById('kid1Rewards').textContent = `+${b.kid1.rewards} Kč`;
-            document.getElementById('kid1Fines').textContent = `-${b.kid1.fines} Kč`;
-
-            document.getElementById('kid2Balance').textContent = `${(b.kid2.rewards - b.kid2.fines)} Kč`;
-            document.getElementById('kid2Rewards').textContent = `+${b.kid2.rewards} Kč`;
-            document.getElementById('kid2Fines').textContent = `-${b.kid2.fines} Kč`;
-
-            document.getElementById('tableKid1Done').textContent = b.kid1.totalDone || 0;
-            document.getElementById('tableKid1Fines').textContent = `${b.kid1.fines} Kč`;
-            document.getElementById('tableKid1Total').textContent = `${(b.kid1.rewards - b.kid1.fines)} Kč`;
-
-            document.getElementById('tableKid2Done').textContent = b.kid2.totalDone || 0;
-            document.getElementById('tableKid2Fines').textContent = `${b.kid2.fines} Kč`;
-            document.getElementById('tableKid2Total').textContent = `${(b.kid2.rewards - b.kid2.fines)} Kč`;
-
-            const isParent = currentUserRole.startsWith('parent');
-            document.getElementById('parentFinanceControls').style.display = isParent ? 'block' : 'none';
-
-            const logContainer = document.getElementById('historyLogs');
-            logContainer.innerHTML = '';
-
-            if (!familyState.logs || familyState.logs.length === 0) {
-                logContainer.innerHTML = `<p class="text-stone-500 text-xs italic">Kronika neobsahuje žádné zápisy.</p>`;
-                return;
-            }
-
-            familyState.logs.slice().reverse().forEach(log => {
-                const item = document.createElement('div');
-                item.className = "bg-stone-900/80 p-2.5 rounded-xl border border-stone-800 flex items-center justify-between";
-                item.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid ${log.type === 'reward' ? 'fa-coins text-amber-400' : log.type === 'penalty' ? 'fa-skull text-rose-400' : 'fa-scroll text-amber-500/70'}"></i>
-                        <span class="text-stone-300 font-medium">${log.text}</span>
-                    </div>
-                    <span class="text-[10px] text-stone-500 shrink-0 ml-2 font-mono">${log.date}</span>
-                `;
-                logContainer.appendChild(item);
-            });
-        }
-
-        // --- User Actions ---
-
-        window.submitTaskForReview = function(choreId, kidKey) {
-            const chore = familyState.chores.find(c => c.id === choreId);
-            if (!chore) return;
-
-            if (!chore.completions) chore.completions = {};
-            chore.completions[kidKey] = 'submitted';
-
-            const kName = kidKey === 'kid1' ? familyState.config.kid1Name : familyState.config.kid2Name;
-            addLog(`${kName} odeslal/a ke kontrole quest: "${chore.title}"`, 'info');
-
-            saveFamilyStateToCloud(familyState);
-        };
-
-        window.approveTask = function(choreId, kidKey) {
-            if (!currentUserRole.startsWith('parent')) return;
-
-            const chore = familyState.chores.find(c => c.id === choreId);
-            if (!chore) return;
-
-            if (!chore.completions) chore.completions = {};
-            chore.completions[kidKey] = 'approved';
-
-            if (!familyState.balances[kidKey]) familyState.balances[kidKey] = { rewards: 0, fines: 0, totalDone: 0 };
-            familyState.balances[kidKey].rewards += chore.reward;
-            familyState.balances[kidKey].totalDone = (familyState.balances[kidKey].totalDone || 0) + 1;
-
-            const kName = kidKey === 'kid1' ? familyState.config.kid1Name : familyState.config.kid2Name;
-            addLog(`Quest Schválen! ${kName} získal/a +${chore.reward} Zlaťáků za "${chore.title}"`, 'reward');
-
-            saveFamilyStateToCloud(familyState);
-        };
-
-        window.rejectTask = function(choreId, kidKey) {
-            if (!currentUserRole.startsWith('parent')) return;
-
-            const chore = familyState.chores.find(c => c.id === choreId);
-            if (!chore) return;
-
-            if (!chore.completions) chore.completions = {};
-            chore.completions[kidKey] = 'pending';
-
-            const kName = kidKey === 'kid1' ? familyState.config.kid1Name : familyState.config.kid2Name;
-            addLog(`Quest byl vrácen pro ${kName}: "${chore.title}"`, 'info');
-
-            saveFamilyStateToCloud(familyState);
-        };
-
-        // Modal Handlers
-        window.openAddTaskModal = function() {
-            document.getElementById('modalTaskTitle').textContent = 'Zadat nový quest';
-            document.getElementById('taskForm').reset();
-            document.getElementById('taskId').value = '';
-            document.getElementById('modalTask').classList.remove('hidden');
-        };
-
-        window.editTask = function(choreId) {
-            const chore = familyState.chores.find(c => c.id === choreId);
-            if (!chore) return;
-
-            document.getElementById('modalTaskTitle').textContent = 'Upravit quest';
-            document.getElementById('taskId').value = chore.id;
-            document.getElementById('taskName').value = chore.title;
-            document.getElementById('taskAssignedTo').value = chore.assignedTo;
-            document.getElementById('taskType').value = chore.type;
-            document.getElementById('taskReward').value = chore.reward;
-            document.getElementById('taskPenalty').value = chore.penalty || 0;
-            document.getElementById('taskDesc').value = chore.desc || '';
-
-            document.getElementById('modalTask').classList.remove('hidden');
-        };
-
-        window.deleteTask = function(choreId) {
-            if (!currentUserRole.startsWith('parent')) return;
-            familyState.chores = familyState.chores.filter(c => c.id !== choreId);
-            addLog(`Quest byl smazán Vládcem.`, 'info');
-            saveFamilyStateToCloud(familyState);
-        };
-
-        window.handleSaveTask = function(e) {
-            e.preventDefault();
-            if (!currentUserRole.startsWith('parent')) return;
-
-            const id = document.getElementById('taskId').value || 'quest-' + Date.now();
-            const title = document.getElementById('taskName').value.trim();
-            const assignedTo = document.getElementById('taskAssignedTo').value;
-            const type = document.getElementById('taskType').value;
-            const reward = parseInt(document.getElementById('taskReward').value) || 0;
-            const penalty = parseInt(document.getElementById('taskPenalty').value) || 0;
-            const desc = document.getElementById('taskDesc').value.trim();
-
-            const existingIndex = familyState.chores.findIndex(c => c.id === id);
-
-            const choreObj = {
-                id,
-                title,
-                assignedTo,
-                type,
-                reward,
-                penalty,
-                desc,
-                completions: existingIndex >= 0 ? (familyState.chores[existingIndex].completions || {}) : {}
-            };
-
-            if (existingIndex >= 0) {
-                familyState.chores[existingIndex] = choreObj;
-            } else {
-                familyState.chores.push(choreObj);
-            }
-
-            addLog(`Uložen quest: "${title}" (${reward} Kč)`, 'info');
-            saveFamilyStateToCloud(familyState);
-            closeModal('modalTask');
-        };
-
-        window.openManualTransactionModal = function() {
-            document.getElementById('manualTxForm').reset();
-            document.getElementById('modalManualTx').classList.remove('hidden');
-        };
-
-        window.handleManualTx = function(e) {
-            e.preventDefault();
-            if (!currentUserRole.startsWith('parent')) return;
-
-            const kidKey = document.getElementById('manualTxKid').value;
-            const type = document.getElementById('manualTxType').value;
-            const amount = parseInt(document.getElementById('manualTxAmount').value) || 0;
-            const reason = document.getElementById('manualTxReason').value.trim();
-
-            const kName = kidKey === 'kid1' ? familyState.config.kid1Name : familyState.config.kid2Name;
-
-            if (!familyState.balances[kidKey]) familyState.balances[kidKey] = { rewards: 0, fines: 0, totalDone: 0 };
-
-            if (type === 'bonus') {
-                familyState.balances[kidKey].rewards += amount;
-                addLog(`Mimořádné zlaťáky pro ${kName}: +${amount} Kč (${reason})`, 'reward');
-            } else {
-                familyState.balances[kidKey].fines += amount;
-                addLog(`Královská pokuta pro ${kName}: -${amount} Kč (${reason})`, 'penalty');
-            }
-
-            saveFamilyStateToCloud(familyState);
-            closeModal('modalManualTx');
-        };
-
-        window.openWeeklyResetModal = function() {
-            const b = familyState.balances;
-
-            const p1 = (b.kid1.rewards - b.kid1.fines);
-            const p2 = (b.kid2.rewards - b.kid2.fines);
-
-            document.getElementById('resetKid1Payout').textContent = `${p1} Kč`;
-            document.getElementById('resetKid2Payout').textContent = `${p2} Kč`;
-
-            document.getElementById('modalWeeklyReset').classList.remove('hidden');
-        };
-
-        window.confirmWeeklyReset = function() {
-            if (!currentUserRole.startsWith('parent')) return;
-
-            const b = familyState.balances;
-            const k1Name = familyState.config.kid1Name || 'Hobit Ady';
-            const k2Name = familyState.config.kid2Name || 'Hobit Vydra';
-
-            const p1 = (b.kid1.rewards - b.kid1.fines);
-            const p2 = (b.kid2.rewards - b.kid2.fines);
-
-            addLog(`Týdenní vyúčtování truhly! Vyplaceno: ${k1Name} (${p1} Kč), ${k2Name} (${p2} Kč)`, 'info');
-
-            familyState.balances = {
-                kid1: { rewards: 0, fines: 0, totalDone: 0 },
-                kid2: { rewards: 0, fines: 0, totalDone: 0 }
-            };
-
-            familyState.chores.forEach(chore => {
-                chore.completions = {};
-            });
-
-            saveFamilyStateToCloud(familyState);
-            closeModal('modalWeeklyReset');
-        };
-
-        function addLog(text, type = 'info') {
-            if (!familyState.logs) familyState.logs = [];
-            familyState.logs.push({
-                id: 'log-' + Date.now(),
-                date: new Date().toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' }),
-                text,
-                type
-            });
-            if (familyState.logs.length > 30) {
-                familyState.logs = familyState.logs.slice(-30);
-            }
-        }
-
-        // Navigation Helpers
-        window.switchTab = function(tab) {
-            currentTab = tab;
-            ['tasks', 'approval', 'summary'].forEach(t => {
-                const el = document.getElementById(`tab-${t}`);
-                const btn = document.getElementById(`nav-${t}`);
-                if (t === tab) {
-                    el.classList.remove('hidden');
-                    btn.classList.add('text-amber-400', 'font-bold');
-                    btn.classList.remove('text-stone-400', 'font-medium');
-                } else {
-                    el.classList.add('hidden');
-                    btn.classList.remove('text-amber-400', 'font-bold');
-                    btn.classList.add('text-stone-400', 'font-medium');
-                }
-            });
-            updateUI();
-        };
-
-        window.filterTasksByKid = function(kid) {
-            currentFilterKid = kid;
-            ['all', 'kid1', 'kid2'].forEach(k => {
-                const btn = document.getElementById(`filter-${k}`);
-                if (k === kid) {
-                    btn.className = "filter-btn flex-1 py-1.5 rounded-lg bg-amber-600 text-stone-950 font-bold text-center transition";
-                } else {
-                    btn.className = "filter-btn flex-1 py-1.5 rounded-lg text-stone-400 hover:text-stone-200 text-center transition";
-                }
-            });
-            renderChores();
-        };
-
-        window.toggleProfileMenu = function() {
-            document.getElementById('profileDropdown').classList.toggle('hidden');
-        };
-
-        window.closeModal = function(id) {
-            document.getElementById(id).classList.add('hidden');
-        };
-
-        document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('profileDropdown');
-            const btn = document.getElementById('profileBtn');
-            if (dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
-                dropdown.classList.add('hidden');
-            }
-        });
-
-        window.onload = function() {
-            initAuth();
-        };
-    </script>
 </body>
 </html>
