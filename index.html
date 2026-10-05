@@ -159,12 +159,12 @@
     }
     .btn-todo { background: #1b4d2e; color: #2ecc71; border: 1px solid #2ecc71; }
     .btn-done { background: #2ecc71; color: #000; }
-    .btn-disabled { background: #222; color: #555; border: 1px solid #333; cursor: not-allowed; }
+    .btn-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
 
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: #0d0a08; border-top: 1.5px solid var(--gold);
-      padding: 10px 14px; display: flex; justify-content: space-around; z-index: 100;
+      padding: 10px 14px; display: flex; justify-around; z-index: 100;
     }
 
     .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
@@ -173,7 +173,6 @@
     .page-section { display: none; }
     .page-section.active { display: block; }
 
-    /* Modální okna */
     .modal-overlay {
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.85); z-index: 300; align-items: center; justify-content: center; padding: 20px;
@@ -206,7 +205,6 @@
     </div>
     <button class="btn-profile-select" id="btn-profile" onclick="toggleMenu()">🧙‍♂️ SARUMAN ∨</button>
 
-    <!-- Roleta bez viditelných PINů -->
     <div class="profile-dropdown" id="profile-dropdown">
       <div class="profile-option" onclick="chooseProfile('Saruman')">🧙‍♂️ Saruman</div>
       <div class="profile-option" onclick="chooseProfile('Galadriel')">🧝‍♀️ Galadriel</div>
@@ -242,14 +240,11 @@
   <div id="page-council" class="page-section">
     <div class="section-title"><span>⚖️ RADNÍ SÍŇ & KONTROLA STAVŮ</span></div>
 
-    <!-- Tlačítko udělení pokuty (jen pro vládce) -->
     <button class="btn-add-fine" id="btn-add-fine" onclick="openFineModal()">⚠️ UDĚLIT OKAMŽITOU POKUTU</button>
 
     <div class="task-card">
       <div class="task-name" style="color:var(--gold); margin-bottom:8px;">📊 Přehled Plnění Úkolů</div>
-      <div id="council-status-container">
-        <!-- Dynamicky načítaný stav plnění z databáze -->
-      </div>
+      <div id="council-status-container"></div>
     </div>
   </div>
 
@@ -325,7 +320,7 @@
         <option value="vydra">🦦 Hobit Vydra</option>
       </select>
       <input type="number" class="modal-input" id="fine-amount" placeholder="Částka pokuty (Kč)">
-      <input type="text" class="modal-input" id="fine-reason" placeholder="Důvod pokuty (např. Neuklizené boty)">
+      <input type="text" class="modal-input" id="fine-reason" placeholder="Důvod pokuty">
       <div class="modal-actions">
         <button class="btn-modal btn-modal-cancel" onclick="closeFineModal()">Zrušit</button>
         <button class="btn-modal btn-modal-save" style="background:var(--accent-red); color:#fff;" onclick="applyFine()">Strhnout Kč</button>
@@ -365,20 +360,18 @@
 
     function toggleMenu() {
       const el = document.getElementById('profile-dropdown');
-      el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+      el.classList.toggle('open');
     }
 
     function chooseProfile(name) {
-      document.getElementById('profile-dropdown').style.display = 'none';
+      document.getElementById('profile-dropdown').classList.remove('open');
       targetProfile = name;
       document.getElementById('pin-modal-title').innerText = 'Zadejte PIN pro ' + name;
       document.getElementById('pin-input').value = '';
       document.getElementById('modal-pin').classList.add('open');
     }
 
-    function closePinModal() {
-      document.getElementById('modal-pin').classList.remove('open');
-    }
+    function closePinModal() { document.getElementById('modal-pin').classList.remove('open'); }
 
     function checkPin() {
       const pin = document.getElementById('pin-input').value;
@@ -420,7 +413,6 @@
 
       if (dbRef) dbRef.update({ adyGolds: familyData.adyGolds, vydraGolds: familyData.vydraGolds });
       closeFineModal();
-      alert(`Udělena pokuta ${amount} Kč. Důvod: ${reason}`);
       render();
     }
 
@@ -428,6 +420,7 @@
       const name = document.getElementById('new-name').value;
       if (!name) return alert('Zadejte název!');
 
+      if(!familyData.tasks) familyData.tasks = [];
       familyData.tasks.push({
         id: Date.now(),
         name: name.toUpperCase(),
@@ -457,17 +450,9 @@
       btn.classList.add('active');
     }
 
-    // Kontrola oprávnění pro odškrtávání
     function toggleTask(id, user) {
-      // Pravidlo 2: Děti smí měnit JEN svoje úkoly
-      if (currentProfile === 'Hobit Ady' && user !== 'ady') {
-        alert('Nemáš oprávnění měnit stav u Hobita Vydry!');
-        return;
-      }
-      if (currentProfile === 'Hobit Vydra' && user !== 'vydra') {
-        alert('Nemáš oprávnění měnit stav u Hobita Ady!');
-        return;
-      }
+      if (currentProfile === 'Hobit Ady' && user !== 'ady') return;
+      if (currentProfile === 'Hobit Vydra' && user !== 'vydra') return;
 
       familyData.tasks = familyData.tasks.map(t => {
         if (t.id === id) {
@@ -490,10 +475,47 @@
 
       document.getElementById("task-count").innerText = list.length;
 
-      // Vykreslení Questů
       document.getElementById("tasks-container").innerHTML = list.map(t => {
         const canClickAdy = isRuler() || currentProfile === 'Hobit Ady';
         const canClickVydra = isRuler() || currentProfile === 'Hobit Vydra';
 
         return `
-          <div class="tas
+          <div class="task-card">
+            <div class="task-tags">
+              <span class="tag-who">${t.who}</span>${t.fine ? `<span class="tag-fine">Pokuta ${t.fine} Kč</span>` : ''}
+            </div>
+            <div class="task-header">
+              <div>
+                <div class="task-name">${t.name}</div>
+                <div class="task-desc">${t.desc}</div>
+              </div>
+              <div class="task-reward">+${t.reward} Kč</div>
+            </div>
+            <div class="user-actions">
+              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Ady') ? `
+                <div class="user-row">
+                  <span><strong>ᛓ HOBIT ADY:</strong></span>
+                  <button class="btn-status ${t.doneAdy ? 'btn-done' : 'btn-todo'} ${!canClickAdy ? 'btn-disabled' : ''}" 
+                          onclick="toggleTask(${t.id}, 'ady')">
+                    ${t.doneAdy ? '✔ HOTOVO' : '✔ SPLNĚNO'}
+                  </button>
+                </div>
+              ` : ''}
+              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra') ? `
+                <div class="user-row">
+                  <span><strong>SYN HOBIT VYDRA:</strong></span>
+                  <button class="btn-status ${t.doneVydra ? 'btn-done' : 'btn-todo'} ${!canClickVydra ? 'btn-disabled' : ''}" 
+                          onclick="toggleTask(${t.id}, 'vydra')">
+                    ${t.doneVydra ? '✔ HOTOVO' : '✔ SPLNĚNO'}
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const councilContainer = document.getElementById("council-status-container");
+      if (councilContainer) {
+        councilContainer.innerHTML = (familyData.tasks || []).map(t => `
+          <div
