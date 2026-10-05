@@ -79,7 +79,7 @@
       border-radius: 12px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.8);
       z-index: 200;
-      width: 200px;
+      width: 220px;
     }
     .profile-dropdown.open { display: block; }
     .profile-option {
@@ -116,12 +116,14 @@
     }
     .role-tab.active { background: var(--gold); color: #000; }
 
-    .btn-add-quest, .btn-add-fine {
+    .btn-action {
       background: var(--gold); color: #000; border: none;
       padding: 10px; border-radius: 8px; font-weight: 900;
-      font-size: 0.85rem; cursor: pointer; width: 100%; margin-bottom: 12px;
+      font-size: 0.85rem; cursor: pointer; width: 100%; margin-bottom: 10px;
     }
-    .btn-add-fine { background: var(--accent-red); color: #fff; }
+    .btn-fine { background: var(--accent-red); color: #fff; }
+    .btn-reset { background: #3498db; color: #fff; }
+    .btn-delete { background: #c0392b; color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
 
     .section-title {
       color: var(--gold); padding-bottom: 6px; margin: 16px 0 10px;
@@ -133,7 +135,7 @@
       margin-bottom: 10px; border: 1px solid var(--gold-border);
     }
 
-    .task-tags { display: flex; gap: 6px; margin-bottom: 6px; }
+    .task-tags { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .tag-who { background: #332215; color: #f39c12; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
     .tag-fine { background: #4a1515; color: #ff6b6b; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
 
@@ -154,8 +156,8 @@
     }
 
     .btn-status {
-      border: none; padding: 8px 14px; border-radius: 8px;
-      font-weight: bold; font-size: 0.8rem; cursor: pointer;
+      border: none; padding: 6px 12px; border-radius: 8px;
+      font-weight: bold; font-size: 0.78rem; cursor: pointer;
     }
     .btn-todo { background: #1b4d2e; color: #2ecc71; border: 1px solid #2ecc71; }
     .btn-done { background: #2ecc71; color: #000; }
@@ -187,377 +189,4 @@
       width: 100%; background: #120e0b; border: 1px solid var(--gold-border);
       color: #fff; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9rem;
     }
-    .modal-actions { display: flex; gap: 8px; margin-top: 10px; }
-    .btn-modal { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
-    .btn-modal-cancel { background: #333; color: #ccc; }
-    .btn-modal-save { background: var(--gold); color: #000; }
-  </style>
-</head>
-<body>
-
-  <header>
-    <div class="header-logo">
-      <div class="header-logo-icon">💰</div>
-      <div class="header-title">
-        <h1>LEGENDA O KAPESNÉM</h1>
-        <div class="header-status"><span id="status-dot" class="status-dot"></span> <span id="db-status-text">Připojování...</span></div>
-      </div>
-    </div>
-    <button class="btn-profile-select" id="btn-profile" onclick="toggleMenu()">🧙‍♂️ SARUMAN ∨</button>
-
-    <div class="profile-dropdown" id="profile-dropdown">
-      <div class="profile-option" onclick="chooseProfile('Saruman')">🧙‍♂️ Saruman</div>
-      <div class="profile-option" onclick="chooseProfile('Galadriel')">🧝‍♀️ Galadriel</div>
-      <div class="profile-option" onclick="chooseProfile('Hobit Ady')">ᛓ Hobit Ady</div>
-      <div class="profile-option" onclick="chooseProfile('Hobit Vydra')">🦦 Hobit Vydra</div>
-    </div>
-  </header>
-
-  <div class="active-profile-banner">
-    <span>Aktivní profil: <strong id="current-profile-name">SARUMAN</strong></span>
-    <span id="current-profile-role" style="background:var(--gold-dark); color:#fff; padding:2px 6px; border-radius:4px; font-size:0.68rem; font-weight:bold;">EDITOR</span>
-  </div>
-
-  <!-- QUESTY -->
-  <div id="page-quests" class="page-section active">
-    <div class="role-bar">
-      <button class="role-tab active" onclick="setFilter('all', this)">Všechny Questy</button>
-      <button class="role-tab" onclick="setFilter('ady', this)">ᛓ Hobit Ady</button>
-      <button class="role-tab" onclick="setFilter('vydra', this)">🦦 Hobit Vydra</button>
-    </div>
-
-    <button class="btn-add-quest" id="btn-add-quest" onclick="openAddModal()">+ NOVÝ QUEST</button>
-
-    <div class="section-title">
-      <span>📜 DENNÍ RITUÁLY & POVINNOSTI</span>
-      <span id="task-count" style="background:#2a1e14; color:var(--gold); padding:2px 8px; border-radius:10px; font-size:0.75rem;">0</span>
-    </div>
-
-    <div id="tasks-container"></div>
-  </div>
-
-  <!-- RADNÍ SÍŇ -->
-  <div id="page-council" class="page-section">
-    <div class="section-title"><span>⚖️ RADNÍ SÍŇ & KONTROLA STAVŮ</span></div>
-
-    <button class="btn-add-fine" id="btn-add-fine" onclick="openFineModal()">⚠️ UDĚLIT OKAMŽITOU POKUTU</button>
-
-    <div class="task-card">
-      <div class="task-name" style="color:var(--gold); margin-bottom:8px;">📊 Přehled Plnění Úkolů</div>
-      <div id="council-status-container"></div>
-    </div>
-  </div>
-
-  <!-- POKLADNICE -->
-  <div id="page-treasury" class="page-section">
-    <div class="section-title"><span>💰 POKLADNICE KRAJE</span></div>
-    <div class="task-card">
-      <div class="user-row">
-        <span><strong>ᛓ Hobit Ady:</strong></span>
-        <span class="task-reward"><span id="treasury-ady">0</span> Kč</span>
-      </div>
-      <div class="user-row" style="margin-top:8px;">
-        <span><strong>🦦 Hobit Vydra:</strong></span>
-        <span class="task-reward"><span id="treasury-vydra">0</span> Kč</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- BOTTOM NAV -->
-  <div class="bottom-nav">
-    <div class="nav-item active" onclick="navTo('quests', this)">
-      <div style="font-size:1.2rem;">📜</div>
-      <div>QUESTY</div>
-    </div>
-    <div class="nav-item" onclick="navTo('council', this)">
-      <div style="font-size:1.2rem;">⚖️</div>
-      <div>RADNÍ SÍŇ</div>
-    </div>
-    <div class="nav-item" onclick="navTo('treasury', this)">
-      <div style="font-size:1.2rem;">💰</div>
-      <div>POKLADNICE</div>
-    </div>
-  </div>
-
-  <!-- PIN MODAL -->
-  <div class="modal-overlay" id="modal-pin">
-    <div class="modal-card">
-      <div class="modal-title" id="pin-modal-title">Zadejte PIN</div>
-      <input type="password" class="modal-input" id="pin-input" placeholder="Zadejte PIN" pattern="[0-9]*" inputmode="numeric">
-      <div class="modal-actions">
-        <button class="btn-modal btn-modal-cancel" onclick="closePinModal()">Zrušit</button>
-        <button class="btn-modal btn-modal-save" onclick="checkPin()">Potvrdit</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADD QUEST MODAL -->
-  <div class="modal-overlay" id="modal-add-quest">
-    <div class="modal-card">
-      <div class="modal-title">Vytvořit Nový Quest</div>
-      <input type="text" class="modal-input" id="new-name" placeholder="Název úkolu">
-      <input type="text" class="modal-input" id="new-desc" placeholder="Popis">
-      <input type="number" class="modal-input" id="new-reward" placeholder="Odměna (Kč)">
-      <input type="number" class="modal-input" id="new-fine" placeholder="Pokuta (Kč)">
-      <select class="modal-input" id="new-who">
-        <option value="Oba Hobiti">Oba Hobiti</option>
-        <option value="Hobit Ady">Hobit Ady</option>
-        <option value="Hobit Vydra">Hobit Vydra</option>
-      </select>
-      <div class="modal-actions">
-        <button class="btn-modal btn-modal-cancel" onclick="closeAddModal()">Zrušit</button>
-        <button class="btn-modal btn-modal-save" onclick="saveQuest()">Uložit</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADD FINE MODAL -->
-  <div class="modal-overlay" id="modal-add-fine">
-    <div class="modal-card">
-      <div class="modal-title" style="color:var(--accent-red);">Udělit Pokutu Hobitovi</div>
-      <select class="modal-input" id="fine-who">
-        <option value="ady">ᛓ Hobit Ady</option>
-        <option value="vydra">🦦 Hobit Vydra</option>
-      </select>
-      <input type="number" class="modal-input" id="fine-amount" placeholder="Částka pokuty (Kč)">
-      <input type="text" class="modal-input" id="fine-reason" placeholder="Důvod pokuty">
-      <div class="modal-actions">
-        <button class="btn-modal btn-modal-cancel" onclick="closeFineModal()">Zrušit</button>
-        <button class="btn-modal btn-modal-save" style="background:var(--accent-red); color:#fff;" onclick="applyFine()">Strhnout Kč</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCCQjpUXAuZi08D96BX0JKAuGNE4E3xq0Q",
-      authDomain: "hobiti-kapesne-2d8ae.firebaseapp.com",
-      projectId: "hobiti-kapesne-2d8ae",
-      storageBucket: "hobiti-kapesne-2d8ae.firebasestorage.app",
-      messagingSenderId: "6584046927",
-      appId: "1:6584046927:web:c13c1760d0d1997f4da13a"
-    };
-
-    let familyData = {
-      adyGolds: 0, vydraGolds: 0,
-      tasks: [
-        { id: 1, name: "ÚKLID HOBITÍ NORY & STOLU", desc: "Každé ráno před druhou snídaní.", reward: 20, fine: 5, who: "Oba Hobiti", doneAdy: false, doneVydra: false },
-        { id: 2, name: "KRMENÍ VRCÁKŮ A MAZLÍČKŮ", desc: "Pravidelný denní rituál v Kraji.", reward: 15, fine: 10, who: "Hobit Ady", doneAdy: false, doneVydra: false },
-        { id: 3, name: "MYTÍ NÁDOBÍ Z ELFÍ HOSTINY", desc: "Umyvatelné misky a číše.", reward: 25, fine: 0, who: "Hobit Vydra", doneAdy: false, doneVydra: false }
-      ]
-    };
-
-    let activeFilter = 'all';
-    let currentProfile = 'Saruman';
-    let targetProfile = null;
-    let dbRef = null;
-
-    const PINS = { 'Saruman': '1234', 'Galadriel': '1234', 'Hobit Ady': '1111', 'Hobit Vydra': '2222' };
-
-    function isRuler() {
-      return currentProfile === 'Saruman' || currentProfile === 'Galadriel';
-    }
-
-    function toggleMenu() {
-      document.getElementById('profile-dropdown').classList.toggle('open');
-    }
-
-    function chooseProfile(name) {
-      document.getElementById('profile-dropdown').classList.remove('open');
-      targetProfile = name;
-      document.getElementById('pin-modal-title').innerText = 'Zadejte PIN pro ' + name;
-      document.getElementById('pin-input').value = '';
-      document.getElementById('modal-pin').classList.add('open');
-    }
-
-    function closePinModal() { document.getElementById('modal-pin').classList.remove('open'); }
-
-    function checkPin() {
-      const pin = document.getElementById('pin-input').value;
-      if (pin === PINS[targetProfile]) {
-        currentProfile = targetProfile;
-        document.getElementById('btn-profile').innerText = currentProfile + ' ∨';
-        document.getElementById('current-profile-name').innerText = currentProfile.toUpperCase();
-        
-        const ruler = isRuler();
-        document.getElementById('current-profile-role').innerText = ruler ? 'EDITOR' : 'DIVÁK';
-        document.getElementById('btn-add-quest').style.display = ruler ? 'block' : 'none';
-        document.getElementById('btn-add-fine').style.display = ruler ? 'block' : 'none';
-
-        closePinModal();
-        render();
-      } else {
-        alert('Špatný PIN!');
-      }
-    }
-
-    function openAddModal() { document.getElementById('modal-add-quest').classList.add('open'); }
-    function closeAddModal() { document.getElementById('modal-add-quest').classList.remove('open'); }
-
-    function openFineModal() { document.getElementById('modal-add-fine').classList.add('open'); }
-    function closeFineModal() { document.getElementById('modal-add-fine').classList.remove('open'); }
-
-    function applyFine() {
-      const who = document.getElementById('fine-who').value;
-      const amount = parseInt(document.getElementById('fine-amount').value) || 0;
-
-      if (amount <= 0) return alert('Zadejte částku pokuty!');
-
-      if (who === 'ady') {
-        familyData.adyGolds = Math.max(0, (familyData.adyGolds || 0) - amount);
-      } else {
-        familyData.vydraGolds = Math.max(0, (familyData.vydraGolds || 0) - amount);
-      }
-
-      if (dbRef) dbRef.update({ adyGolds: familyData.adyGolds, vydraGolds: familyData.vydraGolds }).catch(() => {});
-      closeFineModal();
-      render();
-    }
-
-    function saveQuest() {
-      const name = document.getElementById('new-name').value;
-      if (!name) return alert('Zadejte název!');
-
-      if(!familyData.tasks) familyData.tasks = [];
-      familyData.tasks.push({
-        id: Date.now(),
-        name: name.toUpperCase(),
-        desc: document.getElementById('new-desc').value || 'Úkol v Kraji.',
-        reward: parseInt(document.getElementById('new-reward').value) || 0,
-        fine: parseInt(document.getElementById('new-fine').value) || 0,
-        who: document.getElementById('new-who').value,
-        doneAdy: false, doneVydra: false
-      });
-
-      if (dbRef) dbRef.update({ tasks: familyData.tasks }).catch(() => {});
-      closeAddModal();
-      render();
-    }
-
-    function setFilter(f, btn) {
-      activeFilter = f;
-      document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      render();
-    }
-
-    function navTo(page, btn) {
-      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      document.getElementById('page-' + page).classList.add('active');
-      btn.classList.add('active');
-    }
-
-    function toggleTask(id, user) {
-      if (currentProfile === 'Hobit Ady' && user !== 'ady') return;
-      if (currentProfile === 'Hobit Vydra' && user !== 'vydra') return;
-
-      familyData.tasks = familyData.tasks.map(t => {
-        if (t.id === id) {
-          if (user === 'ady') t.doneAdy = !t.doneAdy;
-          if (user === 'vydra') t.doneVydra = !t.doneVydra;
-        }
-        return t;
-      });
-      if (dbRef) dbRef.update({ tasks: familyData.tasks }).catch(() => {});
-      render();
-    }
-
-    function render() {
-      document.getElementById("treasury-ady").innerText = familyData.adyGolds || 0;
-      document.getElementById("treasury-vydra").innerText = familyData.vydraGolds || 0;
-
-      let list = familyData.tasks || [];
-      if (activeFilter === 'ady') list = list.filter(t => t.who === 'Oba Hobiti' || t.who === 'Hobit Ady');
-      if (activeFilter === 'vydra') list = list.filter(t => t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra');
-
-      document.getElementById("task-count").innerText = list.length;
-
-      document.getElementById("tasks-container").innerHTML = list.map(t => {
-        const canClickAdy = isRuler() || currentProfile === 'Hobit Ady';
-        const canClickVydra = isRuler() || currentProfile === 'Hobit Vydra';
-
-        return `
-          <div class="task-card">
-            <div class="task-tags">
-              <span class="tag-who">${t.who}</span>
-              ${t.fine ? `<span class="tag-fine">Pokuta ${t.fine} Kč</span>` : ''}
-            </div>
-            <div class="task-header">
-              <div>
-                <div class="task-name">${t.name}</div>
-                <div class="task-desc">${t.desc}</div>
-              </div>
-              <div class="task-reward">+${t.reward} Kč</div>
-            </div>
-            <div class="user-actions">
-              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Ady') ? `
-                <div class="user-row">
-                  <span><strong>ᛓ HOBIT ADY:</strong></span>
-                  <button class="btn-status ${t.doneAdy ? 'btn-done' : 'btn-todo'} ${!canClickAdy ? 'btn-disabled' : ''}" 
-                          onclick="toggleTask(${t.id}, 'ady')">
-                    ${t.doneAdy ? '✔ HOTOVO' : '✔ SPLNĚNO'}
-                  </button>
-                </div>
-              ` : ''}
-              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra') ? `
-                <div class="user-row">
-                  <span><strong>SYN HOBIT VYDRA:</strong></span>
-                  <button class="btn-status ${t.doneVydra ? 'btn-done' : 'btn-todo'} ${!canClickVydra ? 'btn-disabled' : ''}" 
-                          onclick="toggleTask(${t.id}, 'vydra')">
-                    ${t.doneVydra ? '✔ HOTOVO' : '✔ SPLNĚNO'}
-                  </button>
-                </div>
-              ` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      const councilContainer = document.getElementById("council-status-container");
-      if (councilContainer) {
-        councilContainer.innerHTML = (familyData.tasks || []).map(t => `
-          <div style="border-bottom: 1px dashed rgba(243,156,18,0.2); padding: 8px 0; font-size: 0.85rem;">
-            <div style="font-weight:bold; color:#fff;">${t.name}</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Ady') ? `<span>ᛓ Ady: <strong style="color:${t.doneAdy?'#2ecc71':'#ff6b6b'}">${t.doneAdy?'SPLNĚNO':'ČEKÁ'}</strong></span>` : ''}
-              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra') ? `<span>🦦 Vydra: <strong style="color:${t.doneVydra?'#2ecc71':'#ff6b6b'}">${t.doneVydra?'SPLNĚNO':'ČEKÁ'}</strong></span>` : ''}
-            </div>
-          </div>
-        `).join('');
-      }
-    }
-
-    // Okamžité vykreslení
-    render();
-
-    // Načtení databáze na pozadí bez zablokování GUI
-    window.addEventListener('DOMContentLoaded', () => {
-      try {
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        firebase.auth().signInAnonymously().then(() => {
-          document.getElementById("db-status-text").innerText = "Živě v cloudu";
-          document.getElementById("status-dot").classList.add("online");
-          dbRef = db.collection("families").doc("hlavni_rodina");
-          dbRef.onSnapshot(snap => {
-            if (snap.exists) { 
-              familyData = snap.data(); 
-              render(); 
-            } else { 
-              dbRef.set(familyData); 
-            }
-          }, () => {
-            document.getElementById("db-status-text").innerText = "Lokální režim";
-          });
-        }).catch(() => { 
-          document.getElementById("db-status-text").innerText = "Lokální režim"; 
-        });
-      } catch(e) { 
-        document.getElementById("db-status-text").innerText = "Lokální režim"; 
-      }
-    });
-  </script>
-
-</body>
-</html>
+    .modal-actions { display: flex; gap: 
