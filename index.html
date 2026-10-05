@@ -43,6 +43,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
     }
 
     .header-logo { display: flex; align-items: center; gap: 10px; }
@@ -69,6 +70,32 @@
       font-size: 0.8rem;
       cursor: pointer;
     }
+
+    /* Roleta profilů */
+    .profile-dropdown {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 16px;
+      background: #1c1815;
+      border: 1.5px solid var(--gold);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.8);
+      z-index: 200;
+      width: 200px;
+      overflow: hidden;
+    }
+    .profile-dropdown.open { display: block; }
+    .profile-option {
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--text-light);
+      cursor: pointer;
+      border-bottom: 1px solid rgba(243, 156, 18, 0.15);
+    }
+    .profile-option:last-child { border-bottom: none; }
+    .profile-option:hover { background: #2a1e14; color: var(--gold); }
 
     .active-profile-banner {
       background: #18130e;
@@ -137,6 +164,21 @@
       border-radius: 10px;
       font-size: 0.75rem;
       border: 1px solid var(--gold-border);
+    }
+
+    .btn-add-quest {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 900;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+      margin-bottom: 12px;
+      text-align: center;
     }
 
     .task-card {
@@ -216,6 +258,50 @@
 
     .page-section { display: none; }
     .page-section.active { display: block; }
+
+    /* Modální okna (PIN a Nový quest) */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-card {
+      background: #1c1815;
+      border: 1.5px solid var(--gold);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+    }
+    .modal-title { font-size: 1.1rem; font-weight: 900; color: var(--gold); margin-bottom: 12px; text-align: center; }
+    .modal-input {
+      width: 100%;
+      background: #120e0b;
+      border: 1px solid var(--gold-border);
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+    .modal-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-modal {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-modal-cancel { background: #333; color: #ccc; }
+    .btn-modal-save { background: var(--gold); color: #000; }
   </style>
 </head>
 <body>
@@ -228,7 +314,15 @@
         <div class="header-status"><span id="status-dot" class="status-dot"></span> <span id="db-status-text">Inicializace...</span></div>
       </div>
     </div>
-    <button class="btn-profile-select" id="btn-profile" onclick="window.switchProfile()">🧙‍♂️ SARUMAN ∨</button>
+    <button class="btn-profile-select" id="btn-profile" onclick="window.toggleProfileMenu()">🧙‍♂️ SARUMAN ∨</button>
+
+    <!-- Roleta výběru profilu -->
+    <div class="profile-dropdown" id="profile-dropdown">
+      <div class="profile-option" onclick="window.selectProfile('Saruman')">🧙‍♂️ Saruman (PIN)</div>
+      <div class="profile-option" onclick="window.selectProfile('Galadriel')">🧝‍♀️ Galadriel (PIN)</div>
+      <div class="profile-option" onclick="window.selectProfile('Hobit Ady')">ᛓ Hobit Ady</div>
+      <div class="profile-option" onclick="window.selectProfile('Hobit Vydra')">🦦 Hobit Vydra</div>
+    </div>
   </header>
 
   <div class="active-profile-banner">
@@ -243,6 +337,9 @@
       <button class="role-tab" onclick="window.filterUser('ady', this)">ᛓ Hobit Ady</button>
       <button class="role-tab" onclick="window.filterUser('vydra', this)">🦦 Hobit Vydra</button>
     </div>
+
+    <!-- Tlačítko přidat quest (jen pro vládce) -->
+    <button class="btn-add-quest" id="btn-add-quest" onclick="window.openAddQuestModal()">+ NOVÝ QUEST</button>
 
     <div class="section-title">
       <span>📜 DENNÍ RITUÁLY & POVINNOSTI</span>
@@ -259,7 +356,7 @@
     <div class="section-title"><span>⚖️ RADNÍ SÍŇ</span></div>
     <div class="task-card">
       <div class="task-name">Týdenní vyhodnocení</div>
-      <div class="task-desc">Zde vládci Středozemě vyplacují zlaťáky a udělejí případné pokuty.</div>
+      <div class="task-desc">Zde vládci Středozemě vyplacují zlaťáky a udělují případné pokuty.</div>
     </div>
   </div>
 
@@ -294,6 +391,38 @@
     </div>
   </div>
 
+  <!-- MODAL: PIN -->
+  <div class="modal-overlay" id="modal-pin">
+    <div class="modal-card">
+      <div class="modal-title" id="pin-modal-title">Zadejte Rodičovský PIN</div>
+      <input type="password" class="modal-input" id="pin-input" placeholder="Zadejte PIN (např. 1234)" pattern="[0-9]*" inputmode="numeric">
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal-cancel" onclick="window.closePinModal()">Zrušit</button>
+        <button class="btn-modal btn-modal-save" onclick="window.confirmPin()">Potvrdit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVÝ QUEST -->
+  <div class="modal-overlay" id="modal-add-quest">
+    <div class="modal-card">
+      <div class="modal-title">Vytvořit Nový Quest</div>
+      <input type="text" class="modal-input" id="new-task-name" placeholder="Název úkolu (např. Vynést odpadky)">
+      <input type="text" class="modal-input" id="new-task-desc" placeholder="Popis úkolu">
+      <input type="number" class="modal-input" id="new-task-reward" placeholder="Odměna (Kč)">
+      <input type="number" class="modal-input" id="new-task-fine" placeholder="Pokuta při nesplnění (Kč)">
+      <select class="modal-input" id="new-task-who">
+        <option value="Oba Hobiti">Oba Hobiti</option>
+        <option value="Hobit Ady">Hobit Ady</option>
+        <option value="Hobit Vydra">Hobit Vydra</option>
+      </select>
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal-cancel" onclick="window.closeAddQuestModal()">Zrušit</button>
+        <button class="btn-modal btn-modal-save" onclick="window.saveNewQuest()">Uložit Quest</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCCQjpUXAuZi08D96BX0JKAuGNE4E3xq0Q",
@@ -307,7 +436,15 @@
     let familyData = null;
     let activeFilter = 'all';
     let currentProfile = 'Saruman';
+    let pendingProfile = null;
     let dbRef = null;
+
+    const PINS = {
+      'Saruman': '1234',
+      'Galadriel': '1234',
+      'Hobit Ady': '1111',
+      'Hobit Vydra': '2222'
+    };
 
     function getDefaultTasks() {
       return {
@@ -321,7 +458,92 @@
       };
     }
 
-    // Globální obslužné funkce přístupné pro onclick
+    // Roleta profilů
+    window.toggleProfileMenu = function() {
+      document.getElementById('profile-dropdown').classList.toggle('open');
+    };
+
+    window.selectProfile = function(profileName) {
+      document.getElementById('profile-dropdown').classList.remove('open');
+      if (profileName === currentProfile) return;
+
+      pendingProfile = profileName;
+      document.getElementById('pin-modal-title').innerText = 'Zadejte PIN pro ' + profileName;
+      document.getElementById('pin-input').value = '';
+      document.getElementById('modal-pin').classList.add('open');
+    };
+
+    window.closePinModal = function() {
+      document.getElementById('modal-pin').classList.remove('open');
+      pendingProfile = null;
+    };
+
+    window.confirmPin = function() {
+      const inputPin = document.getElementById('pin-input').value;
+      const requiredPin = PINS[pendingProfile] || '1234';
+
+      if (inputPin === requiredPin) {
+        currentProfile = pendingProfile;
+        document.getElementById('btn-profile').innerText = (currentProfile === 'Saruman' ? '🧙‍♂️ ' : currentProfile === 'Galadriel' ? '🧝‍♀️ ' : '👤 ') + currentProfile + ' ∨';
+        document.getElementById('current-profile-name').innerText = currentProfile.toUpperCase();
+        
+        const isEditor = (currentProfile === 'Saruman' || currentProfile === 'Galadriel');
+        document.getElementById('current-profile-role').innerText = isEditor ? 'EDITOR' : 'DIVÁK';
+        document.getElementById('btn-add-quest').style.display = isEditor ? 'block' : 'none';
+
+        window.closePinModal();
+        renderApp();
+      } else {
+        alert('Nesprávný PIN!');
+      }
+    };
+
+    // Práce s Novým Questem
+    window.openAddQuestModal = function() {
+      document.getElementById('modal-add-quest').classList.add('open');
+    };
+
+    window.closeAddQuestModal = function() {
+      document.getElementById('modal-add-quest').classList.remove('open');
+    };
+
+    window.saveNewQuest = function() {
+      const name = document.getElementById('new-task-name').value;
+      const desc = document.getElementById('new-task-desc').value;
+      const reward = parseInt(document.getElementById('new-task-reward').value) || 0;
+      const fine = parseInt(document.getElementById('new-task-fine').value) || 0;
+      const who = document.getElementById('new-task-who').value;
+
+      if (!name) { alert('Zadejte název úkolu!'); return; }
+
+      const newTask = {
+        id: Date.now(),
+        name: name.toUpperCase(),
+        desc: desc || 'Pravidelná povinnost v Kraji.',
+        reward: reward,
+        fine: fine,
+        who: who,
+        doneAdy: false,
+        doneVydra: false
+      };
+
+      if (!familyData.tasks) familyData.tasks = [];
+      familyData.tasks.push(newTask);
+
+      renderApp();
+
+      if (dbRef) {
+        dbRef.update({ tasks: familyData.tasks });
+      }
+
+      window.closeAddQuestModal();
+      document.getElementById('new-task-name').value = '';
+      document.getElementById('new-task-desc').value = '';
+      document.getElementById('new-task-reward').value = '';
+      document.getElementById('new-task-fine').value = '';
+    };
+
+    // Navigace a filtry
     window.filterUser = function(filter, btn) {
       activeFilter = filter;
       document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
@@ -338,16 +560,6 @@
       if (btn) btn.classList.add('active');
     };
 
-    window.switchProfile = function() {
-      const profiles = ['Saruman', 'Galadriel', 'Hobit Ady', 'Hobit Vydra'];
-      let nextIndex = (profiles.indexOf(currentProfile) + 1) % profiles.length;
-      currentProfile = profiles[nextIndex];
-
-      document.getElementById('btn-profile').innerText = currentProfile + ' ∨';
-      document.getElementById('current-profile-name').innerText = currentProfile.toUpperCase();
-      document.getElementById('current-profile-role').innerText = (currentProfile === 'Saruman' || currentProfile === 'Galadriel') ? 'EDITOR' : 'DIVÁK';
-    };
-
     window.toggleTask = function(taskId, user) {
       if (!familyData || !familyData.tasks) return;
       
@@ -362,7 +574,7 @@
       renderApp();
 
       if (dbRef) {
-        dbRef.update({ tasks: familyData.tasks }).catch(err => console.warn("Zápis do cloud DB selhal:", err));
+        dbRef.update({ tasks: familyData.tasks }).catch(err => console.warn("Zápis selhal:", err));
       }
     };
 
@@ -371,99 +583,4 @@
 
       const treasuryAdy = document.getElementById("treasury-ady");
       const treasuryVydra = document.getElementById("treasury-vydra");
-      if (treasuryAdy) treasuryAdy.innerText = familyData.adyGolds || 0;
-      if (treasuryVydra) treasuryVydra.innerText = familyData.vydraGolds || 0;
-
-      let filteredTasks = familyData.tasks || [];
-      if (activeFilter === 'ady') {
-        filteredTasks = filteredTasks.filter(t => t.who === 'Oba Hobiti' || t.who === 'Hobit Ady');
-      } else if (activeFilter === 'vydra') {
-        filteredTasks = filteredTasks.filter(t => t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra');
-      }
-
-      const taskCountEl = document.getElementById("task-count");
-      if (taskCountEl) taskCountEl.innerText = filteredTasks.length;
-
-      const container = document.getElementById("tasks-container");
-      if (!container) return;
-
-      container.innerHTML = filteredTasks.map(t => `
-        <div class="task-card">
-          <div class="task-tags">
-            <span class="tag-who">${t.who}</span>
-            ${t.fine ? `<span class="tag-fine">Pokuta ${t.fine} Kč</span>` : ''}
-          </div>
-          <div class="task-header">
-            <div>
-              <div class="task-name">${t.name}</div>
-              <div class="task-desc">${t.desc}</div>
-            </div>
-            <div class="task-reward">+${t.reward} Kč</div>
-          </div>
-          <div class="user-actions">
-            ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Ady') ? `
-              <div class="user-row">
-                <span><strong>ᛓ HOBIT ADY:</strong></span>
-                <button class="btn-status ${t.doneAdy ? 'btn-done' : 'btn-todo'}" onclick="window.toggleTask(${t.id}, 'ady')">
-                  ${t.doneAdy ? '✔ HOTOVO' : '✔ SPLNĚNO (POSLAT)'}
-                </button>
-              </div>
-            ` : ''}
-            ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra') ? `
-              <div class="user-row">
-                <span><strong>SYN HOBIT VYDRA:</strong></span>
-                <button class="btn-status ${t.doneVydra ? 'btn-done' : 'btn-todo'}" onclick="window.toggleTask(${t.id}, 'vydra')">
-                  ${t.doneVydra ? '✔ HOTOVO' : '✔ SPLNĚNO (POSLAT)'}
-                </button>
-              </div>
-            ` : ''}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // Inicializace aplikace
-    function init() {
-      familyData = getDefaultTasks();
-      renderApp();
-
-      if (typeof firebase !== 'undefined') {
-        try {
-          firebase.initializeApp(firebaseConfig);
-          const db = firebase.firestore();
-          const auth = firebase.auth();
-
-          auth.signInAnonymously().then(() => {
-            document.getElementById("db-status-text").innerText = "Živě v cloudu";
-            document.getElementById("status-dot").classList.add("online");
-
-            dbRef = db.collection("families").doc("hlavni_rodina");
-            dbRef.onSnapshot((docSnap) => {
-              if (docSnap.exists) {
-                familyData = docSnap.data();
-                renderApp();
-              } else {
-                dbRef.set(getDefaultTasks());
-              }
-            }, (err) => {
-              console.warn("Firestore snapshot error:", err);
-              document.getElementById("db-status-text").innerText = "Lokální režim";
-            });
-          }).catch((err) => {
-            console.warn("Auth Error:", err);
-            document.getElementById("db-status-text").innerText = "Lokální režim";
-          });
-        } catch (e) {
-          console.warn("Firebase Init Exception:", e);
-          document.getElementById("db-status-text").innerText = "Lokální režim";
-        }
-      } else {
-        document.getElementById("db-status-text").innerText = "Lokální režim";
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', init);
-  </script>
-
-</body>
-</html>
+      if (treasuryAdy) treasuryAdy.innerText = familyData
