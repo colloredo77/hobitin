@@ -136,6 +136,7 @@
 
     .task-tags { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .tag-who { background: #332215; color: #f39c12; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
+    .tag-type { background: #1a2e3b; color: #3498db; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
     .tag-fine { background: #4a1515; color: #ff6b6b; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
 
     .task-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
@@ -160,15 +161,16 @@
     }
     .btn-todo { background: #1b4d2e; color: #2ecc71; border: 1px solid #2ecc71; }
     .btn-done { background: #2ecc71; color: #000; }
+    .btn-confirm { background: #e67e22; color: #fff; }
     .btn-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
 
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: #0d0a08; border-top: 1.5px solid var(--gold);
-      padding: 10px 14px; display: flex; justify-content: space-around; z-index: 100;
+      padding: 8px 4px; display: flex; justify-content: space-around; z-index: 100;
     }
 
-    .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
     .nav-item.active { color: var(--gold); }
 
     .page-section { display: none; }
@@ -192,6 +194,15 @@
     .btn-modal { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
     .btn-modal-cancel { background: #333; color: #ccc; }
     .btn-modal-save { background: var(--gold); color: #000; }
+
+    .fine-log-item {
+      background: #2a1111; border: 1px solid var(--accent-red);
+      border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; font-size: 0.8rem;
+    }
+    .chronicle-card {
+      background: #181410; border: 1px solid var(--gold-border);
+      border-radius: 10px; padding: 10px; margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -208,7 +219,7 @@
 
     <div class="profile-dropdown" id="profile-dropdown">
       <div class="profile-option" onclick="chooseProfile('Saruman')">🧙‍♂️ Saruman</div>
-      <div class="profile-option" onclick="chooseProfile('Galadriel')">🧝‍♀️ Galadriel</div>
+      <div class="profile-option" onclick="chooseProfile('Galadriel')">🧝‍♀️️ Galadriel</div>
       <div class="profile-option" onclick="chooseProfile('Hobit Ady')">ᛓ Hobit Ady</div>
       <div class="profile-option" onclick="chooseProfile('Hobit Vydra')">🦦 Hobit Vydra</div>
       <div class="profile-option" style="color:var(--gold);" onclick="openPinConfig()">🔑 Změna PINů</div>
@@ -242,10 +253,15 @@
   <div id="page-council" class="page-section">
     <div class="section-title"><span>⚖️ ROKLINKA - PORADNÍ SÍŇ</span></div>
 
-    <button class="btn-action btn-fine" id="btn-add-fine" onclick="openFineModal()">⚠️ UDĚLIT OKAMŽITOU POKUTU</button>
+    <button class="btn-action btn-fine" id="btn-add-fine" onclick="openFineModal()">⚠️️ UDĚLIT OKAMŽITOU POKUTU</button>
 
     <div class="task-card">
-      <div class="task-name" style="color:var(--gold); margin-bottom:12px;">📊 Přehled Úkolů & Schvalování</div>
+      <div class="task-name" style="color:var(--accent-red); margin-bottom:8px;">⚠️ Registr Uložených Pokut</div>
+      <div id="fines-log-container"></div>
+    </div>
+
+    <div class="task-card">
+      <div class="task-name" style="color:var(--gold); margin-bottom:12px;">📊 Čekající Úkoly na Schválení</div>
       <div id="council-status-container"></div>
     </div>
   </div>
@@ -254,7 +270,7 @@
   <div id="page-treasury" class="page-section">
     <div class="section-title"><span>💰 MORIA - POKLADNICE KRAJE</span></div>
     
-    <button class="btn-action btn-reset" id="btn-reset-score" onclick="resetWeeklyScore()">🔄 VYNULOVAT SKÓRE PO TÝDNU</button>
+    <button class="btn-action btn-reset" id="btn-reset-score" onclick="resetWeeklyScore()">🔄 VYNULOVAT SKÓRE PO TÝDNU A ULOŽIT</button>
 
     <div class="task-card">
       <div class="user-row" style="padding:12px;">
@@ -268,19 +284,29 @@
     </div>
   </div>
 
+  <!-- KRONIKA -->
+  <div id="page-chronicle" class="page-section">
+    <div class="section-title"><span>📜 KRONIKA KRAJE (HISTORIE)</span></div>
+    <div id="chronicle-container"></div>
+  </div>
+
   <!-- BOTTOM NAV -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="navTo('quests', this)">
-      <div style="font-size:1.2rem;">📜</div>
+      <div style="font-size:1.1rem;">📜</div>
       <div>QUESTY</div>
     </div>
     <div class="nav-item" onclick="navTo('council', this)">
-      <div style="font-size:1.2rem;">⚖️</div>
+      <div style="font-size:1.1rem;">⚖️</div>
       <div>ROKLINKA</div>
     </div>
     <div class="nav-item" onclick="navTo('treasury', this)">
-      <div style="font-size:1.2rem;">💰</div>
+      <div style="font-size:1.1rem;">💰</div>
       <div>MORIA</div>
+    </div>
+    <div class="nav-item" onclick="navTo('chronicle', this)">
+      <div style="font-size:1.1rem;">📜</div>
+      <div>KRONIKA</div>
     </div>
   </div>
 
@@ -313,7 +339,7 @@
         <button class="btn-modal btn-modal-save" onclick="savePins()">Uložit PINy</button>
       </div>
     </div>
-  </div
+  </div>
 
   <!-- ADD QUEST MODAL -->
   <div class="modal-overlay" id="modal-add-quest">
@@ -323,11 +349,20 @@
       <input type="text" class="modal-input" id="new-desc" placeholder="Popis">
       <input type="number" class="modal-input" id="new-reward" placeholder="Odměna (Kč)">
       <input type="number" class="modal-input" id="new-fine" placeholder="Pokuta (Kč)">
+      
+      <label style="font-size:0.75rem; color:#aaa; margin-top:4px; display:block;">Typ questu:</label>
+      <select class="modal-input" id="new-type">
+        <option value="repeat">Opakovaný (denní)</option>
+        <option value="once">Jednorázový</option>
+      </select>
+
+      <label style="font-size:0.75rem; color:#aaa; margin-top:4px; display:block;">Určeno pro:</label>
       <select class="modal-input" id="new-who">
         <option value="Oba Hobiti">Oba Hobiti</option>
         <option value="Hobit Ady">Hobit Ady</option>
         <option value="Hobit Vydra">Hobit Vydra</option>
       </select>
+
       <div class="modal-actions">
         <button class="btn-modal btn-modal-cancel" onclick="closeAddModal()">Zrušit</button>
         <button class="btn-modal btn-modal-save" onclick="saveQuest()">Uložit</button>
@@ -341,7 +376,7 @@
       <div class="modal-title" style="color:var(--accent-red);">Udělit Pokutu Hobitovi</div>
       <select class="modal-input" id="fine-who">
         <option value="ady">ᛓ Hobit Ady</option>
-        <option value="vydra">ml ml 🦦 Hobit Vydra</option>
+        <option value="vydra">🦦 Hobit Vydra</option>
       </select>
       <input type="number" class="modal-input" id="fine-amount" placeholder="Částka pokuty (Kč)">
       <input type="text" class="modal-input" id="fine-reason" placeholder="Důvod pokuty">
@@ -365,10 +400,12 @@
     let familyData = {
       adyGolds: 0, vydraGolds: 0,
       pins: { 'Saruman': '1234', 'Galadriel': '1234', 'Hobit Ady': '1111', 'Hobit Vydra': '2222' },
+      finesLog: [],
+      chronicle: [],
       tasks: [
-        { id: 1, name: "ÚKLID HOBITÍ NORY & STOLU", desc: "Každé ráno před druhou snídaní.", reward: 20, fine: 5, who: "Oba Hobiti", doneAdy: false, doneVydra: false },
-        { id: 2, name: "KRMENÍ VRCÁKŮ A MAZLÍČKŮ", desc: "Pravidelný denní rituál v Kraji.", reward: 15, fine: 10, who: "Hobit Ady", doneAdy: false, doneVydra: false },
-        { id: 3, name: "MYTÍ NÁDOBÍ Z ELFÍ HOSTINY", desc: "Umyvatelné misky a číše.", reward: 25, fine: 0, who: "Hobit Vydra", doneAdy: false, doneVydra: false }
+        { id: 1, name: "ÚKLID HOBITÍ NORY & STOLU", desc: "Každé ráno před druhou snídaní.", reward: 20, fine: 5, type: 'repeat', who: "Oba Hobiti", doneAdy: false, doneVydra: false, confirmedAdy: false, confirmedVydra: false, lastReset: Date.now() },
+        { id: 2, name: "KRMENÍ VRCÁKŮ A MAZLÍČKŮ", desc: "Pravidelný denní rituál v Kraji.", reward: 15, fine: 10, type: 'repeat', who: "Hobit Ady", doneAdy: false, doneVydra: false, confirmedAdy: false, confirmedVydra: false, lastReset: Date.now() },
+        { id: 3, name: "MYTÍ NÁDOBÍ Z ELFÍ HOSTINY", desc: "Umyvatelné misky a číše.", reward: 25, fine: 0, type: 'repeat', who: "Hobit Vydra", doneAdy: false, doneVydra: false, confirmedAdy: false, confirmedVydra: false, lastReset: Date.now() }
       ]
     };
 
@@ -451,6 +488,7 @@
     function applyFine() {
       const who = document.getElementById('fine-who').value;
       const amount = parseInt(document.getElementById('fine-amount').value) || 0;
+      const reason = document.getElementById('fine-reason').value || 'Porušení pravidel Kraje';
 
       if (amount <= 0) return alert('Zadejte částku pokuty!');
 
@@ -460,20 +498,58 @@
         familyData.vydraGolds = Math.max(0, (familyData.vydraGolds || 0) - amount);
       }
 
-      if (dbRef) dbRef.update({ adyGolds: familyData.adyGolds, vydraGolds: familyData.vydraGolds }).catch(() => {});
+      if (!familyData.finesLog) familyData.finesLog = [];
+      familyData.finesLog.unshift({
+        id: Date.now(),
+        date: new Date().toLocaleDateString('cs-CZ') + ' ' + new Date().toLocaleTimeString('cs-CZ', {hour: '2-digit', minute:'2-digit'}),
+        who: who === 'ady' ? 'Hobit Ady' : 'Hobit Vydra',
+        amount: amount,
+        reason: reason
+      });
+
+      if (dbRef) dbRef.update({ adyGolds: familyData.adyGolds, vydraGolds: familyData.vydraGolds, finesLog: familyData.finesLog }).catch(() => {});
       closeFineModal();
       render();
     }
 
     function resetWeeklyScore() {
       if (!isRuler()) return alert('Pouze vládci mohou vynulovat skóre!');
-      if (confirm('Opravdu chcete vynulovat nasbírané zlatky a resetovat stav úkolů na nový týden?')) {
+      if (confirm('Opravdu chcete ukončit týden, uložit bilanci do Kroniky a vynulovat zlatky?')) {
+        
+        if (!familyData.chronicle) familyData.chronicle = [];
+        familyData.chronicle.unshift({
+          id: Date.now(),
+          date: new Date().toLocaleDateString('cs-CZ'),
+          adyGolds: familyData.adyGolds || 0,
+          vydraGolds: familyData.vydraGolds || 0
+        });
+
         familyData.adyGolds = 0;
         familyData.vydraGolds = 0;
         if (familyData.tasks) {
-          familyData.tasks.forEach(t => { t.doneAdy = false; t.doneVydra = false; });
+          familyData.tasks.forEach(t => { 
+            t.doneAdy = false; t.doneVydra = false;
+            t.confirmedAdy = false; t.confirmedVydra = false;
+          });
         }
-        if (dbRef) dbRef.update({ adyGolds: 0, vydraGolds: 0, tasks: familyData.tasks }).catch(() => {});
+
+        if (dbRef) dbRef.update({ 
+          adyGolds: 0, 
+          vydraGolds: 0, 
+          tasks: familyData.tasks,
+          chronicle: familyData.chronicle 
+        }).catch(() => {});
+        
+        render();
+        alert('Týden byl zapsán do Kroniky a počítadlo vynulováno.');
+      }
+    }
+
+    function deleteChronicleEntry(id) {
+      if (!isRuler()) return alert('Pouze vládci mohou mazat záznamy z Kroniky!');
+      if (confirm('Opravdu chcete smazat tento záznam z Kroniky?')) {
+        familyData.chronicle = familyData.chronicle.filter(item => item.id !== id);
+        if (dbRef) dbRef.update({ chronicle: familyData.chronicle }).catch(() => {});
         render();
       }
     }
@@ -498,8 +574,11 @@
         desc: document.getElementById('new-desc').value || 'Úkol v Kraji.',
         reward: parseInt(document.getElementById('new-reward').value) || 0,
         fine: parseInt(document.getElementById('new-fine').value) || 0,
+        type: document.getElementById('new-type').value,
         who: document.getElementById('new-who').value,
-        doneAdy: false, doneVydra: false
+        doneAdy: false, doneVydra: false,
+        confirmedAdy: false, confirmedVydra: false,
+        lastReset: Date.now()
       });
 
       if (dbRef) dbRef.update({ tasks: familyData.tasks }).catch(() => {});
@@ -527,26 +606,68 @@
 
       familyData.tasks = familyData.tasks.map(t => {
         if (t.id === id) {
-          const oldState = user === 'ady' ? t.doneAdy : t.doneVydra;
-          const newState = !oldState;
-          
-          if (user === 'ady') {
-            t.doneAdy = newState;
-            familyData.adyGolds = Math.max(0, (familyData.adyGolds || 0) + (newState ? t.reward : -t.reward));
-          }
-          if (user === 'vydra') {
-            t.doneVydra = newState;
-            familyData.vydraGolds = Math.max(0, (familyData.vydraGolds || 0) + (newState ? t.reward : -t.reward));
-          }
+          if (user === 'ady' && !t.confirmedAdy) t.doneAdy = !t.doneAdy;
+          if (user === 'vydra' && !t.confirmedVydra) t.doneVydra = !t.doneVydra;
         }
         return t;
+      });
+
+      if (dbRef) dbRef.update({ tasks: familyData.tasks }).catch(() => {});
+      render();
+    }
+
+    function confirmTask(id, user) {
+      if (!isRuler()) return alert('Pouze vládci mohou potvrdit úkol!');
+
+      familyData.tasks = familyData.tasks.filter(t => {
+        if (t.id === id) {
+          if (user === 'ady' && t.doneAdy && !t.confirmedAdy) {
+            t.confirmedAdy = true;
+            familyData.adyGolds = (familyData.adyGolds || 0) + t.reward;
+          }
+          if (user === 'vydra' && t.doneVydra && !t.confirmedVydra) {
+            t.confirmedVydra = true;
+            familyData.vydraGolds = (familyData.vydraGolds || 0) + t.reward;
+          }
+
+          if (t.type === 'once') {
+            const needAdy = (t.who === 'Oba Hobiti' || t.who === 'Hobit Ady');
+            const needVydra = (t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra');
+            const adyDone = !needAdy || t.confirmedAdy;
+            const vydraDone = !needVydra || t.confirmedVydra;
+            if (adyDone && vydraDone) return false;
+          }
+        }
+        return true;
       });
 
       if (dbRef) dbRef.update({ tasks: familyData.tasks, adyGolds: familyData.adyGolds, vydraGolds: familyData.vydraGolds }).catch(() => {});
       render();
     }
 
+    function checkDailyReset() {
+      if (!familyData.tasks) return;
+      const now = new Date();
+
+      familyData.tasks.forEach(t => {
+        if (t.type === 'repeat') {
+          const last = new Date(t.lastReset || 0);
+          const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 0, 0);
+          
+          if (now >= cutoff && last < cutoff) {
+            t.doneAdy = false;
+            t.doneVydra = false;
+            t.confirmedAdy = false;
+            t.confirmedVydra = false;
+            t.lastReset = now.getTime();
+          }
+        }
+      });
+    }
+
     function render() {
+      checkDailyReset();
+
       document.getElementById("treasury-ady").innerText = familyData.adyGolds || 0;
       document.getElementById("treasury-vydra").innerText = familyData.vydraGolds || 0;
 
@@ -554,17 +675,27 @@
       if (activeFilter === 'ady') list = list.filter(t => t.who === 'Oba Hobiti' || t.who === 'Hobit Ady');
       if (activeFilter === 'vydra') list = list.filter(t => t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra');
 
-      document.getElementById("task-count").innerText = list.length;
+      const visibleQuests = list.filter(t => {
+        const adyFinished = t.confirmedAdy;
+        const vydraFinished = t.confirmedVydra;
+        if (t.who === 'Hobit Ady' && adyFinished) return false;
+        if (t.who === 'Hobit Vydra' && vydraFinished) return false;
+        if (t.who === 'Oba Hobiti' && adyFinished && vydraFinished) return false;
+        return true;
+      });
 
-      document.getElementById("tasks-container").innerHTML = list.map(t => {
-        const canClickAdy = isRuler() || currentProfile === 'Hobit Ady';
-        const canClickVydra = isRuler() || currentProfile === 'Hobit Vydra';
+      document.getElementById("task-count").innerText = visibleQuests.length;
+
+      document.getElementById("tasks-container").innerHTML = visibleQuests.map(t => {
+        const canClickAdy = (isRuler() || currentProfile === 'Hobit Ady') && !t.confirmedAdy;
+        const canClickVydra = (isRuler() || currentProfile === 'Hobit Vydra') && !t.confirmedVydra;
 
         return `
           <div class="task-card">
             <div class="task-tags">
               <div>
                 <span class="tag-who">${t.who}</span>
+                <span class="tag-type">${t.type === 'once' ? 'Jednorázový' : 'Opakovaný'}</span>
                 ${t.fine ? `<span class="tag-fine">Pokuta ${t.fine} Kč</span>` : ''}
               </div>
               ${isRuler() ? `<button class="btn-delete" onclick="deleteTask(${t.id})">🗑️ SMAZAT</button>` : ''}
@@ -577,21 +708,21 @@
               <div class="task-reward">+${t.reward} Kč</div>
             </div>
             <div class="user-actions">
-              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Ady') ? `
+              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Ady') && !t.confirmedAdy ? `
                 <div class="user-row">
                   <span><strong>ᛓ HOBIT ADY:</strong></span>
                   <button class="btn-status ${t.doneAdy ? 'btn-done' : 'btn-todo'} ${!canClickAdy ? 'btn-disabled' : ''}" 
                           onclick="toggleTask(${t.id}, 'ady')">
-                    ${t.doneAdy ? '✔ HOTOVO' : '✔ SPLNĚNO'}
+                    ${t.doneAdy ? '✔ CEKÁ NA SCHVÁLENÍ' : '✔ HOTOVO'}
                   </button>
                 </div>
               ` : ''}
-              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra') ? `
+              ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra') && !t.confirmedVydra ? `
                 <div class="user-row">
                   <span><strong>🦦 HOBIT VYDRA:</strong></span>
                   <button class="btn-status ${t.doneVydra ? 'btn-done' : 'btn-todo'} ${!canClickVydra ? 'btn-disabled' : ''}" 
                           onclick="toggleTask(${t.id}, 'vydra')">
-                    ${t.doneVydra ? '✔ HOTOVO' : '✔ SPLNĚNO'}
+                    ${t.doneVydra ? '✔ ČEKÁ NA SCHVÁLENÍ' : '✔ HOTOVO'}
                   </button>
                 </div>
               ` : ''}
@@ -600,40 +731,74 @@
         `;
       }).join('');
 
+      // Pokuty v Roklince
+      const finesContainer = document.getElementById("fines-log-container");
+      if (finesContainer) {
+        const fines = familyData.finesLog || [];
+        if (fines.length === 0) {
+          finesContainer.innerHTML = '<div style="font-size:0.8rem; color:#888;">Žádné pokuty nebyly uděleny.</div>';
+        } else {
+          finesContainer.innerHTML = fines.map(f => `
+            <div class="fine-log-item">
+              <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                <span style="color:#ff6b6b;">${f.who}</span>
+                <span style="color:#ff6b6b;">-${f.amount} Kč</span>
+              </div>
+              <div style="color:#ccc; font-size:0.75rem; margin-top:2px;">${f.reason} (${f.date})</div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // Potvrzování v Roklince
       const councilContainer = document.getElementById("council-status-container");
       if (councilContainer) {
         councilContainer.innerHTML = (familyData.tasks || []).map(t => {
-          const canClickAdy = isRuler() || currentProfile === 'Hobit Ady';
-          const canClickVydra = isRuler() || currentProfile === 'Hobit Vydra';
           return `
             <div style="border-bottom: 1px dashed rgba(243,156,18,0.2); padding: 10px 0; font-size: 0.85rem;">
               <div style="font-weight:bold; color:#fff; margin-bottom:6px;">${t.name} (+${t.reward} Kč)</div>
               <div style="display:flex; flex-direction:column; gap:6px;">
                 ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Ady') ? `
                   <div style="display:flex; justify-content:space-between; align-items:center; background:#120e0b; padding:6px 10px; border-radius:6px;">
-                    <span>ᛓ Hobit Ady:</span>
-                    <button class="btn-status ${t.doneAdy ? 'btn-done' : 'btn-todo'} ${!canClickAdy ? 'btn-disabled' : ''}" onclick="toggleTask(${t.id}, 'ady')">
-                      ${t.doneAdy ? '✔ HOTOVO' : 'POTVRDIT'}
-                    </button>
+                    <span>ᛓ Hobit Ady: ${t.confirmedAdy ? '✅ Schváleno' : (t.doneAdy ? '⏳ Čeká' : '❌ Nesplněno')}</span>
+                    ${isRuler() && t.doneAdy && !t.confirmedAdy ? `<button class="btn-status btn-confirm" onclick="confirmTask(${t.id}, 'ady')">SCHVÁLIT</button>` : ''}
                   </div>` : ''}
                 ${(t.who === 'Oba Hobiti' || t.who === 'Hobit Vydra') ? `
                   <div style="display:flex; justify-content:space-between; align-items:center; background:#120e0b; padding:6px 10px; border-radius:6px;">
-                    <span>🦦 Hobit Vydra:</span>
-                    <button class="btn-status ${t.doneVydra ? 'btn-done' : 'btn-todo'} ${!canClickVydra ? 'btn-disabled' : ''}" onclick="toggleTask(${t.id}, 'vydra')">
-                      ${t.doneVydra ? '✔ HOTOVO' : 'POTVRDIT'}
-                    </button>
+                    <span>🦦 Hobit Vydra: ${t.confirmedVydra ? '✅ Schváleno' : (t.doneVydra ? '⏳ Čeká' : '❌ Nesplněno')}</span>
+                    ${isRuler() && t.doneVydra && !t.confirmedVydra ? `<button class="btn-status btn-confirm" onclick="confirmTask(${t.id}, 'vydra')">SCHVÁLIT</button>` : ''}
                   </div>` : ''}
               </div>
             </div>
           `;
         }).join('');
       }
+
+      // Kronika
+      const chronicleContainer = document.getElementById("chronicle-container");
+      if (chronicleContainer) {
+        const chronicle = familyData.chronicle || [];
+        if (chronicle.length === 0) {
+          chronicleContainer.innerHTML = '<div class="task-card" style="color:#888;">Kronika je zatím prázdná. Provedené uzávěrky týdnů se objeví zde.</div>';
+        } else {
+          chronicleContainer.innerHTML = chronicle.map(c => `
+            <div class="chronicle-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <strong style="color:var(--gold);">Týden k ${c.date}</strong>
+                ${isRuler() ? `<button class="btn-delete" onclick="deleteChronicleEntry(${c.id})">🗑️ SMAZAT</button>` : ''}
+              </div>
+              <div style="font-size:0.85rem; display:flex; justify-content:space-between;">
+                <span>ᛓ Hobit Ady: <strong>${c.adyGolds} Kč</strong></span>
+                <span>🦦 Hobit Vydra: <strong>${c.vydraGolds} Kč</strong></span>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
     }
 
-    // Okamžité vykreslení lokálního stavu
     render();
 
-    // Načtení databáze
     setTimeout(() => {
       try {
         if (typeof firebase !== 'undefined') {
