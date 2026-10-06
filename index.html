@@ -150,12 +150,45 @@
                 </div>
             </section>
 
-            <!-- TAB 2: Radní Síň (Approval Queue) -->
+            <!-- TAB 2: Roklinka (Approval Queue & Table Summary) -->
             <section id="tab-approval" class="hidden space-y-4">
                 <div class="bg-amber-950/40 border border-amber-700/50 rounded-2xl p-3.5 flex items-start gap-3">
                     <i class="fa-solid fa-shield-halved text-amber-400 text-xl mt-0.5"></i>
                     <div class="text-xs text-amber-200/90 leading-relaxed">
-                        <strong class="text-amber-400 font-fantasy">Radní síň schvalování:</strong> Zde hobiti předkládají dokončené úkoly. Saruman či Galadriel je zkontrolují, udělí zlaťáky nebo vrátí k předělání!
+                        <strong class="text-amber-400 font-fantasy">Roklinka (Schvalování):</strong> Zde hobiti předkládají dokončené úkoly. Saruman či Galadriel je zkontrolují, udělí zlaťáky nebo vrátí k předělání!
+                    </div>
+                </div>
+
+                <!-- Table Summary in Roklinka -->
+                <div class="bg-stone-900/90 border border-amber-900/40 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="bg-stone-950 px-4 py-3 border-b border-amber-900/30 flex items-center justify-between">
+                        <h3 class="text-xs font-fantasy font-bold text-amber-400 uppercase tracking-wider">Svitek týdenních výsledků</h3>
+                        <span class="text-[11px] text-stone-400" id="currentWeekDateRoklinka">Aktuální věk</span>
+                    </div>
+
+                    <div class="divide-y divide-stone-800/80 text-xs">
+                        <div class="grid grid-cols-4 px-4 py-2 font-fantasy font-bold text-amber-500/80 text-[10px] uppercase">
+                            <span>Hobit</span>
+                            <span class="text-center">Questy</span>
+                            <span class="text-center">Pokuty</span>
+                            <span class="text-right">Truhla</span>
+                        </div>
+                        
+                        <!-- Hobit Ady Row -->
+                        <div class="grid grid-cols-4 px-4 py-3 items-center">
+                            <span class="font-bold text-stone-200 name-kid1">Hobit Ady</span>
+                            <span class="text-center text-emerald-400 font-semibold" id="tableKid1Done">0</span>
+                            <span class="text-center text-rose-400 font-semibold" id="tableKid1Fines">0 Kč</span>
+                            <span class="text-right font-extrabold text-amber-300 font-fantasy" id="tableKid1Total">0 Kč</span>
+                        </div>
+
+                        <!-- Hobit Vydra Row -->
+                        <div class="grid grid-cols-4 px-4 py-3 items-center">
+                            <span class="font-bold text-stone-200 name-kid2">Hobit Vydra</span>
+                            <span class="text-center text-cyan-400 font-semibold" id="tableKid2Done">0</span>
+                            <span class="text-center text-rose-400 font-semibold" id="tableKid2Fines">0 Kč</span>
+                            <span class="text-right font-extrabold text-amber-300 font-fantasy" id="tableKid2Total">0 Kč</span>
+                        </div>
                     </div>
                 </div>
 
@@ -164,7 +197,7 @@
                 </div>
             </section>
 
-            <!-- TAB 3: Pokladnice & Týdenní Vyúčtování (Summary) -->
+            <!-- TAB 3: Moria (Pokladnice & Týdenní Vyúčtování) -->
             <section id="tab-summary" class="hidden space-y-4">
                 
                 <!-- Financial Cards for Hobits -->
@@ -224,42 +257,9 @@
                     </div>
                 </div>
 
-                <!-- Table Summary -->
-                <div class="bg-stone-900/90 border border-amber-900/40 rounded-2xl overflow-hidden shadow-sm">
-                    <div class="bg-stone-950 px-4 py-3 border-b border-amber-900/30 flex items-center justify-between">
-                        <h3 class="text-xs font-fantasy font-bold text-amber-400 uppercase tracking-wider">Svitek týdenních výsledků</h3>
-                        <span class="text-[11px] text-stone-400" id="currentWeekDate">Aktuální věk</span>
-                    </div>
-
-                    <div class="divide-y divide-stone-800/80 text-xs">
-                        <div class="grid grid-cols-4 px-4 py-2 font-fantasy font-bold text-amber-500/80 text-[10px] uppercase">
-                            <span>Hobit</span>
-                            <span class="text-center">Questy</span>
-                            <span class="text-center">Pokuty</span>
-                            <span class="text-right">Truhla</span>
-                        </div>
-                        
-                        <!-- Hobit Ady Row -->
-                        <div class="grid grid-cols-4 px-4 py-3 items-center">
-                            <span class="font-bold text-stone-200 name-kid1">Hobit Ady</span>
-                            <span class="text-center text-emerald-400 font-semibold" id="tableKid1Done">0</span>
-                            <span class="text-center text-rose-400 font-semibold" id="tableKid1Fines">0 Kč</span>
-                            <span class="text-right font-extrabold text-amber-300 font-fantasy" id="tableKid1Total">0 Kč</span>
-                        </div>
-
-                        <!-- Hobit Vydra Row -->
-                        <div class="grid grid-cols-4 px-4 py-3 items-center">
-                            <span class="font-bold text-stone-200 name-kid2">Hobit Vydra</span>
-                            <span class="text-center text-cyan-400 font-semibold" id="tableKid2Done">0</span>
-                            <span class="text-center text-rose-400 font-semibold" id="tableKid2Fines">0 Kč</span>
-                            <span class="text-right font-extrabold text-amber-300 font-fantasy" id="tableKid2Total">0 Kč</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- History Log -->
                 <div class="space-y-2">
-                    <h3 class="text-xs font-fantasy font-bold text-amber-400/80 uppercase tracking-wider px-1">Kronika Středozemě</h3>
+                    <h3 class="text-xs font-fantasy font-bold text-amber-400/80 uppercase tracking-wider px-1">Kronika Středozemě (Zápisy z vyúčtování)</h3>
                     <div id="historyLogs" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs custom-scrollbar">
                         <!-- Render logs -->
                     </div>
@@ -283,13 +283,13 @@
                 <span class="text-[11px] font-fantasy">Questy</span>
             </button>
             <button onclick="switchTab('approval')" id="nav-approval" class="nav-btn flex flex-col items-center justify-center py-1.5 text-stone-400 font-medium transition relative">
-                <i class="fa-solid fa-gavel text-lg mb-0.5"></i>
-                <span class="text-[11px] font-fantasy">Radní Síň</span>
+                <i class="fa-solid fa-tree text-lg mb-0.5"></i>
+                <span class="text-[11px] font-fantasy">Roklinka</span>
                 <span id="approvalBadge" class="hidden absolute top-1 right-6 w-4 h-4 bg-amber-500 text-stone-950 rounded-full text-[9px] font-black flex items-center justify-center">0</span>
             </button>
             <button onclick="switchTab('summary')" id="nav-summary" class="nav-btn flex flex-col items-center justify-center py-1.5 text-stone-400 font-medium transition">
-                <i class="fa-solid fa-coins text-lg mb-0.5"></i>
-                <span class="text-[11px] font-fantasy">Pokladnice</span>
+                <i class="fa-solid fa-vault text-lg mb-0.5"></i>
+                <span class="text-[11px] font-fantasy">Moria</span>
             </button>
         </nav>
 
@@ -526,7 +526,7 @@
         const db = getFirestore(app);
 
         // App State
-        let currentUserRole = 'parent1'; // 'parent1' (Saruman), 'parent2' (Galadriel), 'kid1' (Hobit Ady), 'kid2' (Hobit Vydra)
+        let currentUserRole = 'parent1'; 
         let pendingRoleSwitch = null;
         let currentTab = 'tasks';
         let currentFilterKid = 'all';
@@ -663,40 +663,11 @@
                         type: 'daily',
                         desc: 'Pravidelný denní rituál v Kraji.',
                         completions: {}
-                    },
-                    {
-                        id: 'quest-3',
-                        title: 'Mytí nádobí z elfí hostiny',
-                        assignedTo: 'kid2',
-                        reward: 25,
-                        penalty: 0,
-                        type: 'daily',
-                        desc: 'Umyvatelné misky a číše.',
-                        completions: {}
-                    },
-                    {
-                        id: 'quest-4',
-                        title: 'Pomoc s nákupem v Hůrce',
-                        assignedTo: 'both',
-                        reward: 40,
-                        penalty: 0,
-                        type: 'once',
-                        desc: 'Mimořádná výprava pro zásoby.',
-                        completions: {}
                     }
                 ],
-                logs: [
-                    {
-                        id: 'log-0',
-                        date: new Date().toLocaleDateString('cs-CZ'),
-                        text: 'Kronika Středozemě byla započata.',
-                        type: 'info'
-                    }
-                ]
+                logs: []
             };
         }
-
-        // --- Role Switching & PIN Logic ---
 
         window.requestRoleSwitch = function(targetRole) {
             document.getElementById('profileDropdown').classList.add('hidden');
@@ -748,7 +719,6 @@
             }
 
             familyState.config.parentPin = newP;
-            addLog(`Rodičovské heslo (PIN) bylo úspěšně změněno.`, 'info');
             saveFamilyStateToCloud(familyState);
             closeModal('modalChangePin');
         };
@@ -770,12 +740,10 @@
             if (k1) familyState.config.kid1Name = k1;
             if (k2) familyState.config.kid2Name = k2;
 
-            addLog(`Jména hobitů byla aktualizována na: ${familyState.config.kid1Name} a ${familyState.config.kid2Name}.`, 'info');
             saveFamilyStateToCloud(familyState);
             closeModal('modalSettings');
         };
 
-        // --- Render UI ---
         function updateUI() {
             const k1Name = familyState.config.kid1Name || 'Hobit Ady';
             const k2Name = familyState.config.kid2Name || 'Hobit Vydra';
@@ -811,7 +779,6 @@
             document.getElementById('currentProfileName').textContent = roleName;
             document.getElementById('roleBannerText').textContent = isParent ? `${roleName} (Vládce Středozemě)` : `${roleName} (Hobit z Kraje)`;
 
-            // FAB visibility
             const fab = document.getElementById('fabContainer');
             if (isParent && currentTab === 'tasks') {
                 fab.classList.remove('hidden');
@@ -971,7 +938,6 @@
             list.innerHTML = '';
 
             const pendingReviews = [];
-
             const k1Name = familyState.config.kid1Name || 'Hobit Ady';
             const k2Name = familyState.config.kid2Name || 'Hobit Vydra';
 
@@ -997,9 +963,9 @@
 
             if (pendingReviews.length === 0) {
                 list.innerHTML = `
-                    <div class="text-center py-12 text-stone-500 text-xs space-y-2">
-                        <i class="fa-solid fa-shield-cat text-4xl text-stone-700"></i>
-                        <p>Žádné questy nečekají na schválení v Radní síni.</p>
+                    <div class="text-center py-8 text-stone-500 text-xs space-y-2 bg-stone-900/40 rounded-2xl border border-stone-800">
+                        <i class="fa-solid fa-tree text-3xl text-stone-700"></i>
+                        <p>V Roklince nyní nikdo nečeká na schválení.</p>
                     </div>
                 `;
                 return;
@@ -1072,7 +1038,7 @@
             logContainer.innerHTML = '';
 
             if (!familyState.logs || familyState.logs.length === 0) {
-                logContainer.innerHTML = `<p class="text-stone-500 text-xs italic">Kronika neobsahuje žádné zápisy.</p>`;
+                logContainer.innerHTML = `<p class="text-stone-500 text-xs italic">Kronika obsahuje záznamy pouze po provedeném týdenním vyúčtování.</p>`;
                 return;
             }
 
@@ -1081,7 +1047,7 @@
                 item.className = "bg-stone-900/80 p-2.5 rounded-xl border border-stone-800 flex items-center justify-between";
                 item.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <i class="fa-solid ${log.type === 'reward' ? 'fa-coins text-amber-400' : log.type === 'penalty' ? 'fa-skull text-rose-400' : 'fa-scroll text-amber-500/70'}"></i>
+                        <i class="fa-solid fa-coins text-amber-400"></i>
                         <span class="text-stone-300 font-medium">${log.text}</span>
                     </div>
                     <span class="text-[10px] text-stone-500 shrink-0 ml-2 font-mono">${log.date}</span>
@@ -1090,17 +1056,12 @@
             });
         }
 
-        // --- User Actions ---
-
         window.submitTaskForReview = function(choreId, kidKey) {
             const chore = familyState.chores.find(c => c.id === choreId);
             if (!chore) return;
 
             if (!chore.completions) chore.completions = {};
             chore.completions[kidKey] = 'submitted';
-
-            const kName = kidKey === 'kid1' ? familyState.config.kid1Name : familyState.config.kid2Name;
-            addLog(`${kName} odeslal/a ke kontrole quest: "${chore.title}"`, 'info');
 
             saveFamilyStateToCloud(familyState);
         };
@@ -1121,11 +1082,10 @@
                 };
             }
             if (!familyState.balances[kidKey]) familyState.balances[kidKey] = { rewards: 0, fines: 0, totalDone: 0 };
+            
+            // Fixed reward accumulation
             familyState.balances[kidKey].rewards += chore.reward;
             familyState.balances[kidKey].totalDone = (familyState.balances[kidKey].totalDone || 0) + 1;
-
-            const kName = kidKey === 'kid1' ? familyState.config.kid1Name : familyState.config.kid2Name;
-            addLog(`Quest Schválen! ${kName} získal/a +${chore.reward} Zlaťáků za "${chore.title}"`, 'reward');
 
             saveFamilyStateToCloud(familyState);
         };
@@ -1139,13 +1099,9 @@
             if (!chore.completions) chore.completions = {};
             chore.completions[kidKey] = 'pending';
 
-            const kName = kidKey === 'kid1' ? familyState.config.kid1Name : familyState.config.kid2Name;
-            addLog(`Quest byl vrácen pro ${kName}: "${chore.title}"`, 'info');
-
             saveFamilyStateToCloud(familyState);
         };
 
-        // Modal Handlers
         window.openAddTaskModal = function() {
             document.getElementById('modalTaskTitle').textContent = 'Zadat nový quest';
             document.getElementById('taskForm').reset();
@@ -1172,7 +1128,6 @@
         window.deleteTask = function(choreId) {
             if (!currentUserRole.startsWith('parent')) return;
             familyState.chores = familyState.chores.filter(c => c.id !== choreId);
-            addLog(`Quest byl smazán Vládcem.`, 'info');
             saveFamilyStateToCloud(familyState);
         };
 
@@ -1207,7 +1162,6 @@
                 familyState.chores.push(choreObj);
             }
 
-            addLog(`Uložen quest: "${title}" (${reward} Kč)`, 'info');
             saveFamilyStateToCloud(familyState);
             closeModal('modalTask');
         };
@@ -1226,8 +1180,6 @@
             const amount = parseInt(document.getElementById('manualTxAmount').value) || 0;
             const reason = document.getElementById('manualTxReason').value.trim();
 
-            const kName = kidKey === 'kid1' ? familyState.config.kid1Name : familyState.config.kid2Name;
-
             if (!familyState.balances) {
                 familyState.balances = {
                     kid1: { rewards: 0, fines: 0, totalDone: 0 },
@@ -1238,10 +1190,8 @@
 
             if (type === 'bonus') {
                 familyState.balances[kidKey].rewards += amount;
-                addLog(`Mimořádné zlaťáky pro ${kName}: +${amount} Kč (${reason})`, 'reward');
             } else {
                 familyState.balances[kidKey].fines += amount;
-                addLog(`Královská pokuta pro ${kName}: -${amount} Kč (${reason})`, 'penalty');
             }
 
             saveFamilyStateToCloud(familyState);
@@ -1280,9 +1230,10 @@
             const k2Name = familyState.config.kid2Name || 'Hobit Vydra';
 
             const p1 = (b.kid1.rewards - b.kid1.fines);
-            const p2 = (b.kid2.balances ? (b.kid2.rewards - b.kid2.fines) : 0);
+            const p2 = (b.kid2.rewards - b.kid2.fines);
 
-            addLog(`Týdenní vyúčtování truhly! Vyplaceno: ${k1Name} (${p1} Kč), ${k2Name} (${p2} Kč)`, 'info');
+            // Log written ONLY upon weekly reset/payout
+            addLog(`Týdenní vyúčtování: Vyplaceno ${k1Name} (${p1} Kč), ${k2Name} (${p2} Kč)`, 'info');
 
             familyState.balances = {
                 kid1: { rewards: 0, fines: 0, totalDone: 0 },
@@ -1310,7 +1261,6 @@
             }
         }
 
-        // Navigation Helpers
         window.switchTab = function(tab) {
             currentTab = tab;
             ['tasks', 'approval', 'summary'].forEach(t => {
