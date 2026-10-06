@@ -168,12 +168,9 @@
                         <h3 class="text-xs font-fantasy font-bold uppercase tracking-wider text-amber-400">Dekrety Vládců</h3>
                         <span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded">Pouze Mágové</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div>
                         <button onclick="openManualTransactionModal()" class="w-full bg-stone-800 hover:bg-stone-700 text-amber-200 font-semibold py-2 px-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-amber-700/40">
-                            <i class="fa-solid fa-gavel text-amber-400"></i> Pokuta / Bonus
-                        </button>
-                        <button onclick="openWeeklyResetModal()" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-black py-2 px-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md transition font-fantasy">
-                            <i class="fa-solid fa-coins"></i> Vynulovat Týden
+                            <i class="fa-solid fa-gavel text-amber-400"></i> Udělit Pokutu / Bonus
                         </button>
                     </div>
                 </div>
@@ -259,21 +256,25 @@
                         <span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded">Editor</span>
                     </div>
 
-                    <div class="flex flex-wrap gap-2 pt-1">
-                        <button onclick="openSettingsModal()" class="flex-1 bg-stone-800 hover:bg-stone-700 text-amber-200 font-semibold py-2 px-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-amber-700/40">
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="openSettingsModal()" class="bg-stone-800 hover:bg-stone-700 text-amber-200 font-semibold py-2 px-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-amber-700/40">
                             <i class="fa-solid fa-gear text-amber-400"></i> Jména hobitů
                         </button>
-                        <button onclick="openChangePinModal()" class="flex-1 bg-stone-800 hover:bg-stone-700 text-amber-200 font-semibold py-2 px-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-amber-700/40">
+                        <button onclick="openChangePinModal()" class="bg-stone-800 hover:bg-stone-700 text-amber-200 font-semibold py-2 px-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-amber-700/40">
                             <i class="fa-solid fa-key text-amber-400"></i> Změna PINů
                         </button>
                     </div>
+
+                    <button onclick="openWeeklyResetModal()" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md transition font-fantasy mt-2">
+                        <i class="fa-solid fa-coins text-sm"></i> Vynulovat Týden & Uložit do Kroniky
+                    </button>
                 </div>
 
                 <!-- History Log with Clear Option -->
                 <div class="space-y-2">
                     <div class="flex items-center justify-between px-1">
                         <h3 class="text-xs font-fantasy font-bold text-amber-400/80 uppercase tracking-wider">Kronika Středozemě</h3>
-                        <button id="clearLogsBtn" onclick="clearLogs()" class="hidden text-[10px] text-rose-400 hover:text-rose-300 flex items-center gap-1 bg-rose-950/40 border border-rose-900/40 px-2 py-0.5 rounded-md">
+                        <button id="clearLogsBtn" onclick="clearLogs()" class="hidden text-[10px] text-rose-400 hover:text-rose-300 flex items-center gap-1 bg-rose-950/40 border border-rose-900/40 px-2 py-0.5 rounded-md transition">
                             <i class="fa-solid fa-trash"></i> Smazat kroniku
                         </button>
                     </div>
@@ -533,12 +534,12 @@
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'domaci-prace-pan-prstenu';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "demo-key",
-            authDomain: "demo.firebaseapp.com",
-            projectId: "demo-project",
-            storageBucket: "demo.appspot.com",
-            messagingSenderId: "1234567",
-            appId: "1:1234567:web:1234"
+            apiKey: "AIzaSyCCQjpUXAuZi08D96BX0JKAuGNE4E3xq0Q",
+            authDomain: "hobiti-kapesne-2d8ae.firebaseapp.com",
+            projectId: "hobiti-kapesne-2d8ae",
+            storageBucket: "hobiti-kapesne-2d8ae.firebasestorage.app",
+            messagingSenderId: "6584046927",
+            appId: "1:6584046927:web:c13c1760d0d1997f4da13a"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -1080,167 +1081,27 @@
             logContainer.innerHTML = '';
 
             if (!familyState.logs || familyState.logs.length === 0) {
-                logContainer.innerHTML = `<p class="text-stone-500 text-xs italic">Kronika neobsahuje žádné záznamy.</p>`;
+                logContainer.innerHTML = `<p class="text-stone-500 text-xs italic p-3 bg-stone-900/50 rounded-xl text-center border border-dashed border-stone-800">Kronika neobsahuje žádné záznamy.</p>`;
                 return;
             }
 
+            const isParent = currentUserRole.startsWith('parent');
             familyState.logs.slice().reverse().forEach(log => {
                 const item = document.createElement('div');
-                item.className = "bg-stone-900/80 p-2.5 rounded-xl border border-stone-800 flex items-center justify-between";
+                item.className = "bg-stone-900/80 p-2.5 rounded-xl border border-stone-800 flex items-center justify-between gap-2 shadow-sm";
                 item.innerHTML = `
-                    <div class="flex items-center gap-2 pr-2">
-                        <i class="fa-solid fa-coins text-amber-400 shrink-0"></i>
-                        <span class="text-stone-300 font-medium">${log.text}</span>
+                    <div class="flex items-start gap-2 pr-1">
+                        <i class="fa-solid ${log.type === 'weekly_reset' ? 'fa-scroll text-amber-400' : 'fa-coins text-amber-400'} mt-0.5 shrink-0"></i>
+                        <span class="text-stone-200 font-medium leading-snug">${log.text}</span>
                     </div>
-                    <span class="text-[9px] text-stone-500 shrink-0 font-mono">${log.date}</span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[9px] text-stone-500 font-mono">${log.date}</span>
+                        ${isParent ? `<button onclick="deleteSingleLog('${log.id}')" class="text-stone-500 hover:text-rose-400 text-xs p-1" title="Smazat záznam"><i class="fa-solid fa-xmark"></i></button>` : ''}
+                    </div>
                 `;
                 logContainer.appendChild(item);
             });
         }
-
-        window.submitTaskForReview = function(choreId, kidKey) {
-            const chore = familyState.chores.find(c => c.id === choreId);
-            if (!chore) return;
-
-            if (!chore.completions) chore.completions = {};
-            chore.completions[kidKey] = 'submitted';
-
-            saveFamilyStateToCloud(familyState);
-        };
-
-        window.approveTask = function(choreId, kidKey) {
-            if (!currentUserRole.startsWith('parent')) return;
-
-            const chore = familyState.chores.find(c => c.id === choreId);
-            if (!chore) return;
-
-            if (!chore.completions) chore.completions = {};
-            chore.completions[kidKey] = 'approved';
-
-            if (!familyState.balances) {
-                familyState.balances = {
-                    kid1: { rewards: 0, fines: 0, totalDone: 0 },
-                    kid2: { rewards: 0, fines: 0, totalDone: 0 }
-                };
-            }
-            if (!familyState.balances[kidKey]) familyState.balances[kidKey] = { rewards: 0, fines: 0, totalDone: 0 };
-            
-            familyState.balances[kidKey].rewards += chore.reward;
-            familyState.balances[kidKey].totalDone = (familyState.balances[kidKey].totalDone || 0) + 1;
-
-            saveFamilyStateToCloud(familyState);
-        };
-
-        window.rejectTask = function(choreId, kidKey) {
-            if (!currentUserRole.startsWith('parent')) return;
-
-            const chore = familyState.chores.find(c => c.id === choreId);
-            if (!chore) return;
-
-            if (!chore.completions) chore.completions = {};
-            chore.completions[kidKey] = 'pending';
-
-            saveFamilyStateToCloud(familyState);
-        };
-
-        window.openAddTaskModal = function() {
-            document.getElementById('modalTaskTitle').textContent = 'Zadat nový quest';
-            document.getElementById('taskForm').reset();
-            document.getElementById('taskId').value = '';
-            document.getElementById('modalTask').classList.remove('hidden');
-        };
-
-        window.editTask = function(choreId) {
-            const chore = familyState.chores.find(c => c.id === choreId);
-            if (!chore) return;
-
-            document.getElementById('modalTaskTitle').textContent = 'Upravit quest';
-            document.getElementById('taskId').value = chore.id;
-            document.getElementById('taskName').value = chore.title;
-            document.getElementById('taskAssignedTo').value = chore.assignedTo;
-            document.getElementById('taskType').value = chore.type;
-            document.getElementById('taskReward').value = chore.reward;
-            document.getElementById('taskPenalty').value = chore.penalty || 0;
-            document.getElementById('taskDesc').value = chore.desc || '';
-
-            document.getElementById('modalTask').classList.remove('hidden');
-        };
-
-        window.deleteTask = function(choreId) {
-            if (!currentUserRole.startsWith('parent')) return;
-            familyState.chores = familyState.chores.filter(c => c.id !== choreId);
-            saveFamilyStateToCloud(familyState);
-        };
-
-        window.handleSaveTask = function(e) {
-            e.preventDefault();
-            if (!currentUserRole.startsWith('parent')) return;
-
-            const id = document.getElementById('taskId').value || 'quest-' + Date.now();
-            const title = document.getElementById('taskName').value.trim();
-            const assignedTo = document.getElementById('taskAssignedTo').value;
-            const type = document.getElementById('taskType').value;
-            const reward = parseInt(document.getElementById('taskReward').value) || 0;
-            const penalty = parseInt(document.getElementById('taskPenalty').value) || 0;
-            const desc = document.getElementById('taskDesc').value.trim();
-
-            const existingIndex = familyState.chores.findIndex(c => c.id === id);
-
-            const choreObj = {
-                id,
-                title,
-                assignedTo,
-                type,
-                reward,
-                penalty,
-                desc,
-                completions: existingIndex >= 0 ? (familyState.chores[existingIndex].completions || {}) : {}
-            };
-
-            if (existingIndex >= 0) {
-                familyState.chores[existingIndex] = choreObj;
-            } else {
-                familyState.chores.push(choreObj);
-            }
-
-            saveFamilyStateToCloud(familyState);
-            closeModal('modalTask');
-        };
-
-        window.openManualTransactionModal = function() {
-            document.getElementById('manualTxForm').reset();
-            document.getElementById('modalManualTx').classList.remove('hidden');
-        };
-
-        window.handleManualTx = function(e) {
-            e.preventDefault();
-            if (!currentUserRole.startsWith('parent')) return;
-
-            const kidKey = document.getElementById('manualTxKid').value;
-            const type = document.getElementById('manualTxType').value;
-            const amount = parseInt(document.getElementById('manualTxAmount').value) || 0;
-            const reason = document.getElementById('manualTxReason').value.trim();
-            const kidName = kidKey === 'kid1' ? (familyState.config.kid1Name || 'Hobit Ady') : (familyState.config.kid2Name || 'Hobit Vydra');
-
-            if (!familyState.balances) {
-                familyState.balances = {
-                    kid1: { rewards: 0, fines: 0, totalDone: 0 },
-                    kid2: { rewards: 0, fines: 0, totalDone: 0 }
-                };
-            }
-            if (!familyState.balances[kidKey]) familyState.balances[kidKey] = { rewards: 0, fines: 0, totalDone: 0 };
-
-            if (type === 'bonus') {
-                familyState.balances[kidKey].rewards += amount;
-                addLog(`Bonus pro ${kidName}: +${amount} Kč (${reason})`, 'info');
-            } else {
-                familyState.balances[kidKey].fines += amount;
-                addLog(`Pokuta pro ${kidName}: -${amount} Kč (${reason})`, 'warning');
-            }
-
-            saveFamilyStateToCloud(familyState);
-            closeModal('modalManualTx');
-        };
 
         window.openWeeklyResetModal = function() {
             if (!familyState.balances) {
@@ -1275,20 +1136,33 @@
 
             const p1 = (b.kid1.rewards - b.kid1.fines);
             const p2 = (b.kid2.rewards - b.kid2.fines);
+            const dateStr = new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric' });
 
-            addLog(`Týdenní vyúčtování: Vyplaceno ${k1Name} (${p1} Kč), ${k2Name} (${p2} Kč)`, 'info');
+            // Store detailed record into Kronika (Logs)
+            addLog(`📜 Vyúčtování týdne (${dateStr}): ${k1Name} = ${p1} Kč (${b.kid1.totalDone || 0} questů), ${k2Name} = ${p2} Kč (${b.kid2.totalDone || 0} questů)`, 'weekly_reset');
 
+            // Reset balances for new week
             familyState.balances = {
                 kid1: { rewards: 0, fines: 0, totalDone: 0 },
                 kid2: { rewards: 0, fines: 0, totalDone: 0 }
             };
 
-            familyState.chores.forEach(chore => {
-                chore.completions = {};
-            });
+            // Reset completions on tasks
+            if (familyState.chores) {
+                familyState.chores.forEach(chore => {
+                    chore.completions = {};
+                });
+            }
 
             saveFamilyStateToCloud(familyState);
             closeModal('modalWeeklyReset');
+        };
+
+        window.deleteSingleLog = function(logId) {
+            if (!currentUserRole.startsWith('parent')) return;
+            if (!familyState.logs) return;
+            familyState.logs = familyState.logs.filter(l => l.id !== logId);
+            saveFamilyStateToCloud(familyState);
         };
 
         window.clearLogs = function() {
@@ -1302,13 +1176,13 @@
         function addLog(text, type = 'info') {
             if (!familyState.logs) familyState.logs = [];
             familyState.logs.push({
-                id: 'log-' + Date.now(),
-                date: new Date().toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' }),
+                id: 'log-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
+                date: new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric' }) + ' ' + new Date().toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' }),
                 text,
                 type
             });
-            if (familyState.logs.length > 30) {
-                familyState.logs = familyState.logs.slice(-30);
+            if (familyState.logs.length > 50) {
+                familyState.logs = familyState.logs.slice(-50);
             }
         }
 
