@@ -50,7 +50,7 @@
 </head>
 <body class="text-stone-200 min-h-screen flex flex-col items-center justify-start pb-16">
 
-    <div id="app" class="w-full max-w-md bg-stone-950 min-h-screen shadow-2xl flex flex-col justify-between relative border-x border-amber-900/40">
+    <div id="app" class="w-full max-w-md mx-auto bg-stone-950 min-h-screen shadow-2xl flex flex-col justify-between relative border-x border-amber-900/40">
         
         <!-- HEADER -->
         <header class="bg-stone-900/90 backdrop-blur border-b border-amber-800/40 text-stone-100 p-3.5 sticky top-0 z-30 shadow-lg">
@@ -288,8 +288,8 @@
         </main>
 
         <!-- Floating Action Button for Parents (Add Quest) -->
-        <div id="fabContainer" class="fixed bottom-20 right-4 max-w-md w-full pointer-events-none flex justify-end pr-4 z-20">
-            <button onclick="openAddTaskModal()" class="pointer-events-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-black p-3.5 rounded-full shadow-xl flex items-center justify-center transition transform hover:scale-105 active:scale-95 border-2 border-amber-300">
+        <div id="fabContainer" class="fixed bottom-20 right-4 z-40 hidden">
+            <button onclick="openAddTaskModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-black p-3.5 rounded-full shadow-2xl flex items-center justify-center transition transform hover:scale-105 active:scale-95 border-2 border-amber-300">
                 <i class="fa-solid fa-plus text-lg"></i>
             </button>
         </div>
@@ -337,7 +337,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Change PINs (Managed by Editor) -->
+    <!-- MODAL: Change PINs -->
     <div id="modalChangePin" class="hidden fixed inset-0 bg-stone-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-stone-900 border border-amber-700/60 w-full max-w-sm rounded-2xl shadow-2xl p-5 space-y-4 text-stone-200">
             <div class="flex items-center justify-between border-b border-amber-900/40 pb-3">
@@ -368,7 +368,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Settings & Kid Names Customization -->
+    <!-- MODAL: Settings -->
     <div id="modalSettings" class="hidden fixed inset-0 bg-stone-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-stone-900 border border-amber-700/60 w-full max-w-sm rounded-2xl shadow-2xl p-5 space-y-4 text-stone-200">
             <div class="flex items-center justify-between border-b border-amber-900/40 pb-3">
@@ -781,6 +781,197 @@
             closeModal('modalSettings');
         };
 
+        window.openAddTaskModal = function(taskId = null) {
+            if (!currentUserRole.startsWith('parent')) return;
+            
+            const modalTitle = document.getElementById('modalTaskTitle');
+            const taskIdInput = document.getElementById('taskId');
+            const taskNameInput = document.getElementById('taskName');
+            const taskAssignedToInput = document.getElementById('taskAssignedTo');
+            const taskTypeInput = document.getElementById('taskType');
+            const taskRewardInput = document.getElementById('taskReward');
+            const taskPenaltyInput = document.getElementById('taskPenalty');
+            const taskDescInput = document.getElementById('taskDesc');
+
+            if (taskId) {
+                const chore = familyState.chores.find(c => c.id === taskId);
+                if (chore) {
+                    modalTitle.textContent = "Upravit quest";
+                    taskIdInput.value = chore.id;
+                    taskNameInput.value = chore.title || '';
+                    taskAssignedToInput.value = chore.assignedTo || 'both';
+                    taskTypeInput.value = chore.type || 'daily';
+                    taskRewardInput.value = chore.reward || 0;
+                    taskPenaltyInput.value = chore.penalty || 0;
+                    taskDescInput.value = chore.desc || '';
+                }
+            } else {
+                modalTitle.textContent = "Zadat nový quest";
+                taskIdInput.value = '';
+                taskNameInput.value = '';
+                taskAssignedToInput.value = 'both';
+                taskTypeInput.value = 'daily';
+                taskRewardInput.value = 20;
+                taskPenaltyInput.value = 0;
+                taskDescInput.value = '';
+            }
+
+            document.getElementById('modalTask').classList.remove('hidden');
+        };
+
+        window.handleSaveTask = function(e) {
+            e.preventDefault();
+            if (!currentUserRole.startsWith('parent')) return;
+
+            const taskId = document.getElementById('taskId').value;
+            const title = document.getElementById('taskName').value.trim();
+            const assignedTo = document.getElementById('taskAssignedTo').value;
+            const type = document.getElementById('taskType').value;
+            const reward = parseInt(document.getElementById('taskReward').value, 10) || 0;
+            const penalty = parseInt(document.getElementById('taskPenalty').value, 10) || 0;
+            const desc = document.getElementById('taskDesc').value.trim();
+
+            if (!title) return;
+
+            if (taskId) {
+                const choreIndex = familyState.chores.findIndex(c => c.id === taskId);
+                if (choreIndex !== -1) {
+                    familyState.chores[choreIndex] = {
+                        ...familyState.chores[choreIndex],
+                        title,
+                        assignedTo,
+                        type,
+                        reward,
+                        penalty,
+                        desc
+                    };
+                    addLog(`Upraven quest: "${title}"`, 'info');
+                }
+            } else {
+                const newChore = {
+                    id: 'quest-' + Date.now(),
+                    title,
+                    assignedTo,
+                    type,
+                    reward,
+                    penalty,
+                    desc,
+                    completions: {}
+                };
+                familyState.chores.push(newChore);
+                addLog(`Vytvořen nový quest: "${title}" (+${reward} Kč)`, 'info');
+            }
+
+            saveFamilyStateToCloud(familyState);
+            closeModal('modalTask');
+        };
+
+        window.editTask = function(taskId) {
+            window.openAddTaskModal(taskId);
+        };
+
+        window.deleteTask = function(taskId) {
+            if (!currentUserRole.startsWith('parent')) return;
+            const chore = familyState.chores.find(c => c.id === taskId);
+            if (!chore) return;
+
+            familyState.chores = familyState.chores.filter(c => c.id !== taskId);
+            addLog(`Smazán quest: "${chore.title}"`, 'info');
+            saveFamilyStateToCloud(familyState);
+        };
+
+        window.submitTaskForReview = function(taskId, kidId) {
+            const chore = familyState.chores.find(c => c.id === taskId);
+            if (!chore) return;
+
+            if (!chore.completions) chore.completions = {};
+            chore.completions[kidId] = 'submitted';
+
+            const kidName = kidId === 'kid1' ? (familyState.config.kid1Name || 'Hobit Ady') : (familyState.config.kid2Name || 'Hobit Vydra');
+            addLog(`Hobit ${kidName} přihlásil ke schválení quest "${chore.title}"`, 'info');
+
+            saveFamilyStateToCloud(familyState);
+        };
+
+        window.openManualTransactionModal = function() {
+            if (!currentUserRole.startsWith('parent')) return;
+            document.getElementById('manualTxAmount').value = 20;
+            document.getElementById('manualTxReason').value = '';
+            document.getElementById('modalManualTx').classList.remove('hidden');
+        };
+
+        window.handleManualTx = function(e) {
+            e.preventDefault();
+            if (!currentUserRole.startsWith('parent')) return;
+
+            const kid = document.getElementById('manualTxKid').value;
+            const type = document.getElementById('manualTxType').value;
+            const amount = parseInt(document.getElementById('manualTxAmount').value, 10) || 0;
+            const reason = document.getElementById('manualTxReason').value.trim();
+
+            if (amount <= 0 || !reason) return;
+
+            if (!familyState.balances) {
+                familyState.balances = {
+                    kid1: { rewards: 0, fines: 0, totalDone: 0 },
+                    kid2: { rewards: 0, fines: 0, totalDone: 0 }
+                };
+            }
+
+            const kidName = kid === 'kid1' ? (familyState.config.kid1Name || 'Hobit Ady') : (familyState.config.kid2Name || 'Hobit Vydra');
+
+            if (type === 'bonus') {
+                familyState.balances[kid].rewards += amount;
+                addLog(`Dekret Mágů: Udělen bonus +${amount} Kč pro ${kidName} (${reason})`, 'coins');
+            } else {
+                familyState.balances[kid].fines += amount;
+                addLog(`Dekret Mágů: Udělena pokuta -${amount} Kč pro ${kidName} (${reason})`, 'coins');
+            }
+
+            saveFamilyStateToCloud(familyState);
+            closeModal('modalManualTx');
+        };
+
+        window.approveTask = function(taskId, kidId) {
+            if (!currentUserRole.startsWith('parent')) return;
+
+            const chore = familyState.chores.find(c => c.id === taskId);
+            if (!chore) return;
+
+            if (!chore.completions) chore.completions = {};
+            chore.completions[kidId] = 'approved';
+
+            if (!familyState.balances) {
+                familyState.balances = {
+                    kid1: { rewards: 0, fines: 0, totalDone: 0 },
+                    kid2: { rewards: 0, fines: 0, totalDone: 0 }
+                };
+            }
+
+            familyState.balances[kidId].rewards += (chore.reward || 0);
+            familyState.balances[kidId].totalDone = (familyState.balances[kidId].totalDone || 0) + 1;
+
+            const kidName = kidId === 'kid1' ? (familyState.config.kid1Name || 'Hobit Ady') : (familyState.config.kid2Name || 'Hobit Vydra');
+            addLog(`Schválen quest "${chore.title}" pro ${kidName} (+${chore.reward} Kč)`, 'coins');
+
+            saveFamilyStateToCloud(familyState);
+        };
+
+        window.rejectTask = function(taskId, kidId) {
+            if (!currentUserRole.startsWith('parent')) return;
+
+            const chore = familyState.chores.find(c => c.id === taskId);
+            if (!chore) return;
+
+            if (!chore.completions) chore.completions = {};
+            chore.completions[kidId] = 'pending';
+
+            const kidName = kidId === 'kid1' ? (familyState.config.kid1Name || 'Hobit Ady') : (familyState.config.kid2Name || 'Hobit Vydra');
+            addLog(`Vracen quest "${chore.title}" pro ${kidName} k dopracování`, 'info');
+
+            saveFamilyStateToCloud(familyState);
+        };
+
         function updateUI() {
             const k1Name = familyState.config.kid1Name || 'Hobit Ady';
             const k2Name = familyState.config.kid2Name || 'Hobit Vydra';
@@ -1138,16 +1329,13 @@
             const p2 = (b.kid2.rewards - b.kid2.fines);
             const dateStr = new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric' });
 
-            // Store detailed record into Kronika (Logs)
             addLog(`📜 Vyúčtování týdne (${dateStr}): ${k1Name} = ${p1} Kč (${b.kid1.totalDone || 0} questů), ${k2Name} = ${p2} Kč (${b.kid2.totalDone || 0} questů)`, 'weekly_reset');
 
-            // Reset balances for new week
             familyState.balances = {
                 kid1: { rewards: 0, fines: 0, totalDone: 0 },
                 kid2: { rewards: 0, fines: 0, totalDone: 0 }
             };
 
-            // Reset completions on tasks
             if (familyState.chores) {
                 familyState.chores.forEach(chore => {
                     chore.completions = {};
@@ -1184,6 +1372,40 @@
             if (familyState.logs.length > 50) {
                 familyState.logs = familyState.logs.slice(-50);
             }
+        }
+
+        const tabsOrder = ['tasks', 'approval', 'summary'];
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        function setupSwipeGestures() {
+            const appContainer = document.getElementById('app');
+            if (!appContainer) return;
+
+            appContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            appContainer.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].screenX;
+                const touchEndY = e.changedTouches[0].screenY;
+
+                const diffX = touchEndX - touchStartX;
+                const diffY = touchEndY - touchStartY;
+
+                // Vyhodnocení swipu: alespoň 50px do strany a výrazně horiztonální pohyb
+                if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+                    const currentIndex = tabsOrder.indexOf(currentTab);
+                    if (diffX < 0 && currentIndex < tabsOrder.length - 1) {
+                        // Swipe doleva -> Posun na další záložku
+                        switchTab(tabsOrder[currentIndex + 1]);
+                    } else if (diffX > 0 && currentIndex > 0) {
+                        // Swipe doprava -> Posun na předchozí záložku
+                        switchTab(tabsOrder[currentIndex - 1]);
+                    }
+                }
+            }, { passive: true });
         }
 
         window.switchTab = function(tab) {
@@ -1234,9 +1456,13 @@
         });
 
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initAuth);
+            document.addEventListener('DOMContentLoaded', () => {
+                initAuth();
+                setupSwipeGestures();
+            });
         } else {
             initAuth();
+            setupSwipeGestures();
         }
     </script>
 </body>
