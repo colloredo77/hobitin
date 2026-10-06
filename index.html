@@ -48,20 +48,20 @@
         }
     </style>
 </head>
-<body class="text-stone-200 min-h-screen flex flex-col items-center justify-start pb-12">
+<body class="text-stone-200 min-h-screen flex flex-col items-center justify-start pb-16">
 
     <div id="app" class="w-full max-w-md bg-stone-950 min-h-screen shadow-2xl flex flex-col justify-between relative border-x border-amber-900/40">
         
         <!-- HEADER -->
-        <header class="bg-stone-900/90 backdrop-blur border-b border-amber-800/40 text-stone-100 p-4 sticky top-0 z-30 shadow-lg">
-            <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center font-bold text-stone-950 text-lg shadow-md ring-2 ring-amber-400/50">
+        <header class="bg-stone-900/90 backdrop-blur border-b border-amber-800/40 text-stone-100 p-3.5 sticky top-0 z-30 shadow-lg">
+            <div class="flex items-center justify-between mb-2.5">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center font-bold text-stone-950 text-base shadow-md ring-2 ring-amber-400/50">
                         <i class="fa-solid fa-ring"></i>
                     </div>
                     <div>
-                        <h1 class="text-base font-fantasy font-bold tracking-wider text-amber-400 leading-tight">Legenda o Kapesném</h1>
-                        <span id="syncStatus" class="text-[11px] text-amber-200/70 flex items-center gap-1">
+                        <h1 class="text-sm font-fantasy font-bold tracking-wider text-amber-400 leading-tight">Legenda o Kapesném</h1>
+                        <span id="syncStatus" class="text-[10px] text-amber-200/70 flex items-center gap-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Svitky synchronizovány
                         </span>
                     </div>
@@ -69,35 +69,38 @@
 
                 <!-- PROFILE SWITCHER DROPDOWN -->
                 <div class="relative">
-                    <button id="profileBtn" onclick="toggleProfileMenu()" class="flex items-center space-x-2 bg-stone-800 hover:bg-stone-700 px-3 py-1.5 rounded-xl text-xs font-medium border border-amber-700/50 text-amber-200 transition">
+                    <button id="profileBtn" onclick="toggleProfileMenu()" class="flex items-center space-x-1.5 bg-stone-800 hover:bg-stone-700 px-2.5 py-1.5 rounded-xl text-xs font-medium border border-amber-700/50 text-amber-200 transition">
                         <span id="currentProfileRoleIcon"><i class="fa-solid fa-hat-wizard text-amber-400"></i></span>
-                        <span id="currentProfileName" class="max-w-[100px] truncate font-fantasy font-bold">Saruman</span>
-                        <i class="fa-solid fa-chevron-down text-[10px] text-amber-400/70"></i>
+                        <span id="currentProfileName" class="max-w-[90px] truncate font-fantasy font-bold">Saruman</span>
+                        <i class="fa-solid fa-chevron-down text-[9px] text-amber-400/70"></i>
                     </button>
 
-                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-60 bg-stone-900 rounded-2xl shadow-2xl border border-amber-700/60 py-2 text-stone-200 z-50 text-xs">
+                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-56 bg-stone-900 rounded-2xl shadow-2xl border border-amber-700/60 py-2 text-stone-200 z-50 text-xs">
                         <div class="px-3 py-1 text-[10px] font-bold text-amber-500 uppercase tracking-wider font-fantasy flex items-center justify-between">
                             <span>Mágové & Vládci</span>
                             <i class="fa-solid fa-lock text-amber-500"></i>
                         </div>
-                        <button onclick="requestRoleSwitch('parent1')" class="w-full text-left px-4 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
+                        <button onclick="requestRoleSwitch('parent1')" class="w-full text-left px-3.5 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
                             <span><i class="fa-solid fa-hat-wizard text-amber-400 mr-2"></i>Saruman</span>
-                            <span class="text-[10px] bg-amber-950 text-amber-400 border border-amber-700/50 px-1.5 py-0.5 rounded">PIN</span>
+                            <span class="text-[9px] bg-amber-950 text-amber-400 border border-amber-700/50 px-1.5 py-0.5 rounded">PIN</span>
                         </button>
-                        <button onclick="requestRoleSwitch('parent2')" class="w-full text-left px-4 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
+                        <button onclick="requestRoleSwitch('parent2')" class="w-full text-left px-3.5 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
                             <span><i class="fa-solid fa-wand-magic-sparkles text-amber-300 mr-2"></i>Galadriel</span>
-                            <span class="text-[10px] bg-amber-950 text-amber-400 border border-amber-700/50 px-1.5 py-0.5 rounded">PIN</span>
+                            <span class="text-[9px] bg-amber-950 text-amber-400 border border-amber-700/50 px-1.5 py-0.5 rounded">PIN</span>
                         </button>
                         
                         <div class="border-t border-stone-800 my-1"></div>
-                        <div class="px-3 py-1 text-[10px] font-bold text-amber-500 uppercase tracking-wider font-fantasy">Hobiti z Kraje</div>
-                        <button onclick="requestRoleSwitch('kid1')" class="w-full text-left px-4 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
-                            <span><svg class="w-4 h-4 inline-block text-emerald-400 mr-2 fill-current align-sub" viewBox="0 0 24 24"><path d="M6 2v20h2.5v-7.5l7.5-5.5-7.5-2.5V2zm2.5 4.5l4.5 1.5-4.5 3V6.5zm0 8l4.5 3.3-4.5 1.7v-5z"/></svg><span id="labelKid1">Hobit Ady</span></span>
-                            <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-700/50 px-1.5 py-0.5 rounded">Volný</span>
+                        <div class="px-3 py-1 text-[10px] font-bold text-amber-500 uppercase tracking-wider font-fantasy flex items-center justify-between">
+                            <span>Hobiti z Kraje</span>
+                            <i class="fa-solid fa-lock text-emerald-500"></i>
+                        </div>
+                        <button onclick="requestRoleSwitch('kid1')" class="w-full text-left px-3.5 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
+                            <span><svg class="w-3.5 h-3.5 inline-block text-emerald-400 mr-2 fill-current align-sub" viewBox="0 0 24 24"><path d="M6 2v20h2.5v-7.5l7.5-5.5-7.5-2.5V2zm2.5 4.5l4.5 1.5-4.5 3V6.5zm0 8l4.5 3.3-4.5 1.7v-5z"/></svg><span id="labelKid1">Hobit Ady</span></span>
+                            <span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-700/50 px-1.5 py-0.5 rounded">PIN</span>
                         </button>
-                        <button onclick="requestRoleSwitch('kid2')" class="w-full text-left px-4 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
+                        <button onclick="requestRoleSwitch('kid2')" class="w-full text-left px-3.5 py-2 hover:bg-stone-800 flex items-center justify-between font-semibold">
                             <span><i class="fa-solid fa-feather-pointed text-cyan-400 mr-2"></i><span id="labelKid2">Hobit Vydra</span></span>
-                            <span class="text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-700/50 px-1.5 py-0.5 rounded">Volný</span>
+                            <span class="text-[9px] bg-cyan-950 text-cyan-400 border border-cyan-700/50 px-1.5 py-0.5 rounded">PIN</span>
                         </button>
                     </div>
                 </div>
@@ -105,29 +108,29 @@
 
             <!-- Role Banner -->
             <div id="roleBanner" class="bg-stone-950/80 rounded-xl px-3 py-1.5 text-xs flex items-center justify-between border border-amber-900/30">
-                <span class="text-stone-300">Aktivní profil: <strong id="roleBannerText" class="text-amber-400 font-fantasy">Saruman (Plná správa Středozemě)</strong></span>
-                <span id="roleBadge" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Editor</span>
+                <span class="text-stone-300 truncate pr-2">Aktivní: <strong id="roleBannerText" class="text-amber-400 font-fantasy">Saruman</strong></span>
+                <span id="roleBadge" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0">Editor</span>
             </div>
         </header>
 
         <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-5">
+        <main class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
 
             <!-- TAB 1: Questy (Tasks) -->
             <section id="tab-tasks" class="space-y-4">
                 
                 <!-- Filter Buttons -->
-                <div class="flex items-center justify-between bg-stone-900/90 p-1.5 rounded-xl text-xs font-semibold border border-amber-900/30">
-                    <button onclick="filterTasksByKid('all')" id="filter-all" class="filter-btn flex-1 py-1.5 rounded-lg bg-amber-600 text-stone-950 font-bold text-center transition">Všechny Questy</button>
-                    <button onclick="filterTasksByKid('kid1')" id="filter-kid1" class="filter-btn flex-1 py-1.5 rounded-lg text-stone-400 hover:text-stone-200 text-center transition"><span class="name-kid1">Hobit Ady</span></button>
-                    <button onclick="filterTasksByKid('kid2')" id="filter-kid2" class="filter-btn flex-1 py-1.5 rounded-lg text-stone-400 hover:text-stone-200 text-center transition"><span class="name-kid2">Hobit Vydra</span></button>
+                <div class="flex items-center justify-between bg-stone-900/90 p-1 rounded-xl text-xs font-semibold border border-amber-900/30">
+                    <button onclick="filterTasksByKid('all')" id="filter-all" class="filter-btn flex-1 py-1.5 rounded-lg bg-amber-600 text-stone-950 font-bold text-center transition">Všechny</button>
+                    <button onclick="filterTasksByKid('kid1')" id="filter-kid1" class="filter-btn flex-1 py-1.5 rounded-lg text-stone-400 hover:text-stone-200 text-center transition truncate px-1"><span class="name-kid1">Hobit Ady</span></button>
+                    <button onclick="filterTasksByKid('kid2')" id="filter-kid2" class="filter-btn flex-1 py-1.5 rounded-lg text-stone-400 hover:text-stone-200 text-center transition truncate px-1"><span class="name-kid2">Hobit Vydra</span></button>
                 </div>
 
                 <!-- Daily Chores -->
                 <div>
                     <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xs font-fantasy font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-2">
-                            <i class="fa-solid fa-scroll text-amber-500"></i> Denní Rituály & Povinnosti
+                        <h2 class="text-xs font-fantasy font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <i class="fa-solid fa-scroll text-amber-500"></i> Denní Rituály
                         </h2>
                         <span id="countDailyTasks" class="text-xs bg-stone-800 text-amber-300 border border-amber-700/40 px-2 py-0.5 rounded-full font-bold">0</span>
                     </div>
@@ -137,9 +140,9 @@
                 </div>
 
                 <!-- One-time Quests -->
-                <div class="pt-2">
+                <div class="pt-1">
                     <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xs font-fantasy font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-2">
+                        <h2 class="text-xs font-fantasy font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
                             <i class="fa-solid fa-dragon text-amber-500"></i> Mimořádné Questy
                         </h2>
                         <span id="countOnceTasks" class="text-xs bg-stone-800 text-amber-300 border border-amber-700/40 px-2 py-0.5 rounded-full font-bold">0</span>
@@ -150,41 +153,55 @@
                 </div>
             </section>
 
-            <!-- TAB 2: Roklinka (Approval Queue & Table Summary) -->
+            <!-- TAB 2: Roklinka (Approval Queue & Table Summary & Decrees) -->
             <section id="tab-approval" class="hidden space-y-4">
-                <div class="bg-amber-950/40 border border-amber-700/50 rounded-2xl p-3.5 flex items-start gap-3">
-                    <i class="fa-solid fa-shield-halved text-amber-400 text-xl mt-0.5"></i>
+                <div class="bg-amber-950/40 border border-amber-700/50 rounded-2xl p-3 flex items-start gap-2.5">
+                    <i class="fa-solid fa-shield-halved text-amber-400 text-lg mt-0.5"></i>
                     <div class="text-xs text-amber-200/90 leading-relaxed">
-                        <strong class="text-amber-400 font-fantasy">Roklinka (Schvalování):</strong> Zde hobiti předkládají dokončené úkoly. Saruman či Galadriel je zkontrolují, udělí zlaťáky nebo vrátí k předělání!
+                        <strong class="text-amber-400 font-fantasy">Roklinka:</strong> Zde hobiti předkládají hotové úkoly ke schválení. Mágové zde mohou také udělovat dekrety (pokuty/bonusy).
+                    </div>
+                </div>
+
+                <!-- Parents Decrees Panel inside Roklinka -->
+                <div id="roklinkaFinanceControls" class="bg-stone-900/90 rounded-2xl p-3.5 space-y-2.5 gold-border">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-fantasy font-bold uppercase tracking-wider text-amber-400">Dekrety Vládců</h3>
+                        <span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded">Pouze Mágové</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="openManualTransactionModal()" class="w-full bg-stone-800 hover:bg-stone-700 text-amber-200 font-semibold py-2 px-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-amber-700/40">
+                            <i class="fa-solid fa-gavel text-amber-400"></i> Pokuta / Bonus
+                        </button>
+                        <button onclick="openWeeklyResetModal()" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-black py-2 px-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md transition font-fantasy">
+                            <i class="fa-solid fa-coins"></i> Vynulovat Týden
+                        </button>
                     </div>
                 </div>
 
                 <!-- Table Summary in Roklinka -->
                 <div class="bg-stone-900/90 border border-amber-900/40 rounded-2xl overflow-hidden shadow-sm">
-                    <div class="bg-stone-950 px-4 py-3 border-b border-amber-900/30 flex items-center justify-between">
-                        <h3 class="text-xs font-fantasy font-bold text-amber-400 uppercase tracking-wider">Svitek týdenních výsledků</h3>
-                        <span class="text-[11px] text-stone-400" id="currentWeekDateRoklinka">Aktuální věk</span>
+                    <div class="bg-stone-950 px-3.5 py-2.5 border-b border-amber-900/30 flex items-center justify-between">
+                        <h3 class="text-xs font-fantasy font-bold text-amber-400 uppercase tracking-wider">Výsledky Týdne</h3>
+                        <span class="text-[10px] text-stone-400" id="currentWeekDateRoklinka">Aktuální věk</span>
                     </div>
 
                     <div class="divide-y divide-stone-800/80 text-xs">
-                        <div class="grid grid-cols-4 px-4 py-2 font-fantasy font-bold text-amber-500/80 text-[10px] uppercase">
+                        <div class="grid grid-cols-4 px-3.5 py-2 font-fantasy font-bold text-amber-500/80 text-[10px] uppercase">
                             <span>Hobit</span>
                             <span class="text-center">Questy</span>
                             <span class="text-center">Pokuty</span>
                             <span class="text-right">Truhla</span>
                         </div>
                         
-                        <!-- Hobit Ady Row -->
-                        <div class="grid grid-cols-4 px-4 py-3 items-center">
-                            <span class="font-bold text-stone-200 name-kid1">Hobit Ady</span>
+                        <div class="grid grid-cols-4 px-3.5 py-2.5 items-center">
+                            <span class="font-bold text-stone-200 name-kid1 truncate pr-1">Hobit Ady</span>
                             <span class="text-center text-emerald-400 font-semibold" id="tableKid1Done">0</span>
                             <span class="text-center text-rose-400 font-semibold" id="tableKid1Fines">0 Kč</span>
                             <span class="text-right font-extrabold text-amber-300 font-fantasy" id="tableKid1Total">0 Kč</span>
                         </div>
 
-                        <!-- Hobit Vydra Row -->
-                        <div class="grid grid-cols-4 px-4 py-3 items-center">
-                            <span class="font-bold text-stone-200 name-kid2">Hobit Vydra</span>
+                        <div class="grid grid-cols-4 px-3.5 py-2.5 items-center">
+                            <span class="font-bold text-stone-200 name-kid2 truncate pr-1">Hobit Vydra</span>
                             <span class="text-center text-cyan-400 font-semibold" id="tableKid2Done">0</span>
                             <span class="text-center text-rose-400 font-semibold" id="tableKid2Fines">0 Kč</span>
                             <span class="text-right font-extrabold text-amber-300 font-fantasy" id="tableKid2Total">0 Kč</span>
@@ -192,74 +209,74 @@
                     </div>
                 </div>
 
-                <div id="approvalList" class="space-y-3">
-                    <!-- Dynamic review items -->
+                <!-- Approval list header -->
+                <div class="space-y-2">
+                    <h3 class="text-xs font-fantasy font-bold text-amber-400 uppercase tracking-wider px-1">Čekající Questy</h3>
+                    <div id="approvalList" class="space-y-2.5">
+                        <!-- Dynamic review items -->
+                    </div>
                 </div>
             </section>
 
-            <!-- TAB 3: Moria (Pokladnice & Týdenní Vyúčtování) -->
+            <!-- TAB 3: Moria (Pokladnice & Kronika) -->
             <section id="tab-summary" class="hidden space-y-4">
                 
                 <!-- Financial Cards for Hobits -->
                 <div class="grid grid-cols-2 gap-3">
                     <!-- Hobit Ady Card -->
-                    <div class="bg-gradient-to-br from-stone-900 to-emerald-950 text-stone-100 p-4 rounded-2xl gold-border relative overflow-hidden">
-                        <div class="absolute -right-3 -bottom-3 opacity-15 text-7xl font-fantasy font-black text-emerald-400"><i class="fa-solid fa-coins"></i></div>
+                    <div class="bg-gradient-to-br from-stone-900 to-emerald-950 text-stone-100 p-3.5 rounded-2xl gold-border relative overflow-hidden">
+                        <div class="absolute -right-2 -bottom-2 opacity-15 text-6xl font-fantasy font-black text-emerald-400"><i class="fa-solid fa-coins"></i></div>
                         <div class="text-xs font-semibold text-emerald-300 flex items-center justify-between">
-                            <span class="name-kid1 font-fantasy">Hobit Ady</span>
-                            <i class="fa-solid fa-sack-dollar text-emerald-400"></i>
+                            <span class="name-kid1 font-fantasy truncate pr-1">Hobit Ady</span>
+                            <i class="fa-solid fa-sack-dollar text-emerald-400 shrink-0"></i>
                         </div>
-                        <div id="kid1Balance" class="text-2xl font-black font-fantasy text-amber-300 mt-2 mb-1">0 Zlaťáků</div>
-                        <div class="text-[11px] text-stone-400 flex justify-between pt-2 border-t border-emerald-900/50">
+                        <div id="kid1Balance" class="text-xl font-black font-fantasy text-amber-300 mt-2 mb-1">0 Zlaťáků</div>
+                        <div class="text-[10px] text-stone-400 flex justify-between pt-1.5 border-t border-emerald-900/50">
                             <span>Zlaťáky: <strong id="kid1Rewards" class="text-emerald-400">+0</strong></span>
                             <span>Pokuty: <strong id="kid1Fines" class="text-rose-400">-0</strong></span>
                         </div>
                     </div>
 
                     <!-- Hobit Vydra Card -->
-                    <div class="bg-gradient-to-br from-stone-900 to-cyan-950 text-stone-100 p-4 rounded-2xl gold-border relative overflow-hidden">
-                        <div class="absolute -right-3 -bottom-3 opacity-15 text-7xl font-fantasy font-black text-cyan-400"><i class="fa-solid fa-vault"></i></div>
+                    <div class="bg-gradient-to-br from-stone-900 to-cyan-950 text-stone-100 p-3.5 rounded-2xl gold-border relative overflow-hidden">
+                        <div class="absolute -right-2 -bottom-2 opacity-15 text-6xl font-fantasy font-black text-cyan-400"><i class="fa-solid fa-vault"></i></div>
                         <div class="text-xs font-semibold text-cyan-300 flex items-center justify-between">
-                            <span class="name-kid2 font-fantasy">Hobit Vydra</span>
-                            <i class="fa-solid fa-sack-dollar text-cyan-400"></i>
+                            <span class="name-kid2 font-fantasy truncate pr-1">Hobit Vydra</span>
+                            <i class="fa-solid fa-sack-dollar text-cyan-400 shrink-0"></i>
                         </div>
-                        <div id="kid2Balance" class="text-2xl font-black font-fantasy text-amber-300 mt-2 mb-1">0 Zlaťáků</div>
-                        <div class="text-[11px] text-stone-400 flex justify-between pt-2 border-t border-cyan-900/50">
+                        <div id="kid2Balance" class="text-xl font-black font-fantasy text-amber-300 mt-2 mb-1">0 Zlaťáků</div>
+                        <div class="text-[10px] text-stone-400 flex justify-between pt-1.5 border-t border-cyan-900/50">
                             <span>Zlaťáky: <strong id="kid2Rewards" class="text-cyan-400">+0</strong></span>
                             <span>Pokuty: <strong id="kid2Fines" class="text-rose-400">-0</strong></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Parents Actions Panel -->
-                <div id="parentFinanceControls" class="bg-stone-900/90 rounded-2xl p-4 space-y-3 gold-border">
+                <!-- Settings / PIN Controls Panel for Editors -->
+                <div id="moriaEditorControls" class="bg-stone-900/90 rounded-2xl p-3.5 space-y-2.5 gold-border">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-fantasy font-bold uppercase tracking-wider text-amber-400">Dekrety Vládců</h3>
-                        <span class="text-[10px] bg-amber-950 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded">Pouze Mágové</span>
+                        <h3 class="text-xs font-fantasy font-bold uppercase tracking-wider text-amber-400">Správa Středozemě</h3>
+                        <span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded">Editor</span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="openManualTransactionModal()" class="w-full bg-stone-800 hover:bg-stone-700 text-amber-200 font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-amber-700/40">
-                            <i class="fa-solid fa-gavel text-amber-400"></i> Pokuta / Bonus
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        <button onclick="openSettingsModal()" class="flex-1 bg-stone-800 hover:bg-stone-700 text-amber-200 font-semibold py-2 px-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-amber-700/40">
+                            <i class="fa-solid fa-gear text-amber-400"></i> Jména hobitů
                         </button>
-                        <button onclick="openWeeklyResetModal()" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md transition font-fantasy">
-                            <i class="fa-solid fa-coins"></i> Vynulovat Týden
-                        </button>
-                    </div>
-
-                    <div class="pt-2 border-t border-stone-800 flex justify-between items-center">
-                        <button onclick="openSettingsModal()" class="text-[11px] text-amber-400/80 hover:text-amber-300 flex items-center gap-1">
-                            <i class="fa-solid fa-gear"></i> Nastavení a Jména
-                        </button>
-                        <button onclick="openChangePinModal()" class="text-[11px] text-amber-400/80 hover:text-amber-300 flex items-center gap-1">
-                            <i class="fa-solid fa-key"></i> Změnit PIN
+                        <button onclick="openChangePinModal()" class="flex-1 bg-stone-800 hover:bg-stone-700 text-amber-200 font-semibold py-2 px-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-amber-700/40">
+                            <i class="fa-solid fa-key text-amber-400"></i> Změna PINů
                         </button>
                     </div>
                 </div>
 
-                <!-- History Log -->
+                <!-- History Log with Clear Option -->
                 <div class="space-y-2">
-                    <h3 class="text-xs font-fantasy font-bold text-amber-400/80 uppercase tracking-wider px-1">Kronika Středozemě (Zápisy z vyúčtování)</h3>
+                    <div class="flex items-center justify-between px-1">
+                        <h3 class="text-xs font-fantasy font-bold text-amber-400/80 uppercase tracking-wider">Kronika Středozemě</h3>
+                        <button id="clearLogsBtn" onclick="clearLogs()" class="hidden text-[10px] text-rose-400 hover:text-rose-300 flex items-center gap-1 bg-rose-950/40 border border-rose-900/40 px-2 py-0.5 rounded-md">
+                            <i class="fa-solid fa-trash"></i> Smazat kroniku
+                        </button>
+                    </div>
                     <div id="historyLogs" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs custom-scrollbar">
                         <!-- Render logs -->
                     </div>
@@ -271,47 +288,47 @@
 
         <!-- Floating Action Button for Parents (Add Quest) -->
         <div id="fabContainer" class="fixed bottom-20 right-4 max-w-md w-full pointer-events-none flex justify-end pr-4 z-20">
-            <button onclick="openAddTaskModal()" class="pointer-events-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-black p-4 rounded-full shadow-xl flex items-center justify-center transition transform hover:scale-105 active:scale-95 border-2 border-amber-300">
-                <i class="fa-solid fa-plus text-xl"></i>
+            <button onclick="openAddTaskModal()" class="pointer-events-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-black p-3.5 rounded-full shadow-xl flex items-center justify-center transition transform hover:scale-105 active:scale-95 border-2 border-amber-300">
+                <i class="fa-solid fa-plus text-lg"></i>
             </button>
         </div>
 
         <!-- Navigation Bar (Bottom) -->
         <nav class="bg-stone-900 border-t border-amber-800/40 px-2 py-2 sticky bottom-0 z-30 grid grid-cols-3 gap-1">
             <button onclick="switchTab('tasks')" id="nav-tasks" class="nav-btn flex flex-col items-center justify-center py-1.5 text-amber-400 font-bold transition">
-                <i class="fa-solid fa-scroll text-lg mb-0.5"></i>
-                <span class="text-[11px] font-fantasy">Questy</span>
+                <i class="fa-solid fa-scroll text-base mb-0.5"></i>
+                <span class="text-[10px] font-fantasy">Questy</span>
             </button>
             <button onclick="switchTab('approval')" id="nav-approval" class="nav-btn flex flex-col items-center justify-center py-1.5 text-stone-400 font-medium transition relative">
-                <i class="fa-solid fa-tree text-lg mb-0.5"></i>
-                <span class="text-[11px] font-fantasy">Roklinka</span>
+                <i class="fa-solid fa-tree text-base mb-0.5"></i>
+                <span class="text-[10px] font-fantasy">Roklinka</span>
                 <span id="approvalBadge" class="hidden absolute top-1 right-6 w-4 h-4 bg-amber-500 text-stone-950 rounded-full text-[9px] font-black flex items-center justify-center">0</span>
             </button>
             <button onclick="switchTab('summary')" id="nav-summary" class="nav-btn flex flex-col items-center justify-center py-1.5 text-stone-400 font-medium transition">
-                <i class="fa-solid fa-vault text-lg mb-0.5"></i>
-                <span class="text-[11px] font-fantasy">Moria</span>
+                <i class="fa-solid fa-coins text-base mb-0.5"></i>
+                <span class="text-[10px] font-fantasy">Moria</span>
             </button>
         </nav>
 
     </div>
 
-    <!-- MODAL PIN: Verification for Parent Roles -->
+    <!-- MODAL PIN: Verification for Roles -->
     <div id="modalPin" class="hidden fixed inset-0 bg-stone-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-stone-900 border border-amber-700/60 w-full max-w-xs rounded-2xl shadow-2xl p-5 space-y-4 text-center text-stone-200">
             <div class="w-12 h-12 bg-amber-950 text-amber-400 border border-amber-700/50 rounded-full flex items-center justify-center mx-auto text-xl">
                 <i class="fa-solid fa-key"></i>
             </div>
             <div>
-                <h3 class="font-fantasy font-bold text-amber-400 text-base">Heslo Mága</h3>
-                <p class="text-xs text-stone-400 mt-1">Zadejte PIN pro vstup do rodičovské správy <span id="targetRoleName" class="font-bold text-amber-300"></span></p>
+                <h3 class="font-fantasy font-bold text-amber-400 text-base">Ověření totožnosti</h3>
+                <p class="text-xs text-stone-400 mt-1">Zadejte PIN pro vstup do profilu <span id="targetRoleName" class="font-bold text-amber-300"></span></p>
             </div>
 
             <form onsubmit="verifyPin(event)" class="space-y-3">
                 <input type="password" id="inputPin" maxlength="6" autofocus placeholder="****" class="w-full text-center text-2xl tracking-widest font-mono py-2 bg-stone-950 border border-amber-800/60 rounded-xl focus:outline-none focus:border-amber-500 text-amber-300">
                 <p id="pinError" class="text-rose-400 text-xs hidden">Nesprávný PIN! Zkuste znovu.</p>
-                <div class="text-[10px] text-stone-500 italic">(Výchozí rodičovský PIN je 1234)</div>
+                <div class="text-[10px] text-stone-500 italic">(Výchozí rodičovský PIN je 1234, hobitů 0000)</div>
 
-                <div class="flex gap-2 pt-2">
+                <div class="flex gap-2 pt-1">
                     <button type="button" onclick="closeModal('modalPin')" class="flex-1 bg-stone-800 text-stone-300 font-semibold py-2 rounded-xl text-xs">Zrušit</button>
                     <button type="submit" class="flex-1 bg-amber-600 text-stone-950 font-bold py-2 rounded-xl text-xs hover:bg-amber-500 font-fantasy">Vstoupit</button>
                 </div>
@@ -319,28 +336,32 @@
         </div>
     </div>
 
-    <!-- MODAL: Change PIN -->
+    <!-- MODAL: Change PINs (Managed by Editor) -->
     <div id="modalChangePin" class="hidden fixed inset-0 bg-stone-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-stone-900 border border-amber-700/60 w-full max-w-xs rounded-2xl shadow-2xl p-5 space-y-4 text-stone-200">
+        <div class="bg-stone-900 border border-amber-700/60 w-full max-w-sm rounded-2xl shadow-2xl p-5 space-y-4 text-stone-200">
             <div class="flex items-center justify-between border-b border-amber-900/40 pb-3">
-                <h3 class="font-fantasy font-bold text-amber-400 text-sm">Změnit Rodičovský PIN</h3>
+                <h3 class="font-fantasy font-bold text-amber-400 text-sm">Změna PINů (Správa Mágů)</h3>
                 <button onclick="closeModal('modalChangePin')" class="text-stone-400 hover:text-stone-200"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <form onsubmit="handleChangePin(event)" class="space-y-3 text-xs">
                 <div>
-                    <label class="block text-amber-200/80 mb-1">Starý PIN</label>
-                    <input type="password" id="oldPin" required class="w-full text-center text-lg font-mono py-1.5 bg-stone-950 border border-amber-800/60 rounded-xl focus:outline-none focus:border-amber-500">
+                    <label class="block text-amber-200/80 mb-1 font-semibold">Vyberte profil pro změnu PINu</label>
+                    <select id="pinTargetRole" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-stone-200 text-xs">
+                        <option value="parent1">Saruman (Mág)</option>
+                        <option value="parent2">Galadriel (Mág)</option>
+                        <option value="kid1" class="name-kid1-option">Hobit Ady</option>
+                        <option value="kid2" class="name-kid2-option">Hobit Vydra</option>
+                    </select>
                 </div>
                 <div>
-                    <label class="block text-amber-200/80 mb-1">Nový PIN</label>
-                    <input type="password" id="newPin" required maxlength="6" class="w-full text-center text-lg font-mono py-1.5 bg-stone-950 border border-amber-800/60 rounded-xl focus:outline-none focus:border-amber-500">
+                    <label class="block text-amber-200/80 mb-1 font-semibold">Nový PIN (4-6 znaků)</label>
+                    <input type="password" id="newPin" required maxlength="6" placeholder="Nový PIN" class="w-full text-center text-lg font-mono py-1.5 bg-stone-950 border border-amber-800/60 rounded-xl focus:outline-none focus:border-amber-500 text-amber-300">
                 </div>
-                <p id="changePinError" class="text-rose-400 text-xs hidden">Chybný stávající PIN.</p>
 
                 <div class="flex gap-2 pt-2">
                     <button type="button" onclick="closeModal('modalChangePin')" class="flex-1 bg-stone-800 text-stone-300 font-semibold py-2 rounded-xl">Zrušit</button>
-                    <button type="submit" class="flex-1 bg-amber-600 text-stone-950 font-bold py-2 rounded-xl hover:bg-amber-500 font-fantasy">Uložit PIN</button>
+                    <button type="submit" class="flex-1 bg-amber-600 text-stone-950 font-bold py-2 rounded-xl hover:bg-amber-500 font-fantasy">Uložit nový PIN</button>
                 </div>
             </form>
         </div>
@@ -385,7 +406,7 @@
                 
                 <div>
                     <label class="block text-amber-200/80 font-semibold mb-1">Název questu *</label>
-                    <input type="text" id="taskName" required placeholder="Např. Úklid hobití nory, Krmení vrčáků" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-stone-200 text-sm">
+                    <input type="text" id="taskName" required placeholder="Např. Úklid hobití nory" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-stone-200 text-sm">
                 </div>
 
                 <div>
@@ -401,18 +422,18 @@
                     <div>
                         <label class="block text-amber-200/80 font-semibold mb-1">Druh questu</label>
                         <select id="taskType" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-stone-200 text-sm">
-                            <option value="daily">Denní rituál (Opakovat)</option>
-                            <option value="once">Jednorázový quest</option>
+                            <option value="daily">Denní rituál</option>
+                            <option value="once">Jednorázový</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-amber-200/80 font-semibold mb-1">Odměna (Zlaťáky/Kč) *</label>
+                        <label class="block text-amber-200/80 font-semibold mb-1">Odměna (Kč) *</label>
                         <input type="number" id="taskReward" min="0" required value="20" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-sm font-bold text-amber-400">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-amber-200/80 font-semibold mb-1">Pokuta při nesplnění (Kč) <span class="text-stone-500 font-normal">(volitelné)</span></label>
+                    <label class="block text-amber-200/80 font-semibold mb-1">Pokuta při nesplnění (Kč)</label>
                     <input type="number" id="taskPenalty" min="0" value="0" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-rose-500 text-sm text-rose-400">
                 </div>
 
@@ -461,7 +482,7 @@
 
                 <div>
                     <label class="block text-amber-200/80 font-semibold mb-1">Důvod dekretu *</label>
-                    <input type="text" id="manualTxReason" required placeholder="Např. Pomoc s hostinou, Neuklizená zbroj" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-sm text-stone-200">
+                    <input type="text" id="manualTxReason" required placeholder="Např. Pomoc s hostinou" class="w-full px-3 py-2 rounded-xl bg-stone-950 border border-amber-900/50 focus:outline-none focus:border-amber-500 text-sm text-stone-200">
                 </div>
 
                 <div class="pt-2 flex gap-2">
@@ -510,7 +531,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Config
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'domaci-prace-pan-prstenu';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "demo-key",
@@ -525,7 +545,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // App State
         let currentUserRole = 'parent1'; 
         let pendingRoleSwitch = null;
         let currentTab = 'tasks';
@@ -536,7 +555,9 @@
             config: {
                 kid1Name: 'Hobit Ady',
                 kid2Name: 'Hobit Vydra',
-                parentPin: '1234'
+                parentPin: '1234',
+                kid1Pin: '0000',
+                kid2Pin: '0000'
             },
             chores: [],
             logs: [],
@@ -573,25 +594,32 @@
             if (statusEl) {
                 statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Lokální režim (Svitky uloženy)`;
             }
-            const localData = localStorage.getItem('lotr_chores_data');
+            const localData = localStorage.getItem('lotr_chores_data_v2');
             if (localData) {
                 try {
                     familyState = JSON.parse(localData);
-                    if (!familyState.config.parentPin) familyState.config.parentPin = '1234';
-                    if (!familyState.balances) {
-                        familyState.balances = {
-                            kid1: { rewards: 0, fines: 0, totalDone: 0 },
-                            kid2: { rewards: 0, fines: 0, totalDone: 0 }
-                        };
-                    }
+                    validateStateConfig();
                 } catch (e) {
                     familyState = getInitialDefaultData();
                 }
             } else {
                 familyState = getInitialDefaultData();
-                localStorage.setItem('lotr_chores_data', JSON.stringify(familyState));
+                localStorage.setItem('lotr_chores_data_v2', JSON.stringify(familyState));
             }
             updateUI();
+        }
+
+        function validateStateConfig() {
+            if (!familyState.config) familyState.config = {};
+            if (!familyState.config.parentPin) familyState.config.parentPin = '1234';
+            if (!familyState.config.kid1Pin) familyState.config.kid1Pin = '0000';
+            if (!familyState.config.kid2Pin) familyState.config.kid2Pin = '0000';
+            if (!familyState.balances) {
+                familyState.balances = {
+                    kid1: { rewards: 0, fines: 0, totalDone: 0 },
+                    kid2: { rewards: 0, fines: 0, totalDone: 0 }
+                };
+            }
         }
 
         function listenToFamilyData() {
@@ -601,7 +629,7 @@
                     if (snapshot.exists()) {
                         const data = snapshot.data();
                         familyState = {
-                            config: { parentPin: '1234', kid1Name: 'Hobit Ady', kid2Name: 'Hobit Vydra', ...data.config },
+                            config: { parentPin: '1234', kid1Pin: '0000', kid2Pin: '0000', kid1Name: 'Hobit Ady', kid2Name: 'Hobit Vydra', ...data.config },
                             chores: data.chores || [],
                             logs: data.logs || [],
                             balances: data.balances || {
@@ -623,7 +651,7 @@
 
         async function saveFamilyStateToCloud(newState) {
             if (isOfflineMode) {
-                localStorage.setItem('lotr_chores_data', JSON.stringify(newState));
+                localStorage.setItem('lotr_chores_data_v2', JSON.stringify(newState));
                 updateUI();
                 return;
             }
@@ -631,14 +659,14 @@
                 const docRef = getFamilyDocRef();
                 await setDoc(docRef, newState, { merge: true });
             } catch (e) {
-                localStorage.setItem('lotr_chores_data', JSON.stringify(newState));
+                localStorage.setItem('lotr_chores_data_v2', JSON.stringify(newState));
                 updateUI();
             }
         }
 
         function getInitialDefaultData() {
             return {
-                config: { kid1Name: 'Hobit Ady', kid2Name: 'Hobit Vydra', parentPin: '1234' },
+                config: { kid1Name: 'Hobit Ady', kid2Name: 'Hobit Vydra', parentPin: '1234', kid1Pin: '0000', kid2Pin: '0000' },
                 balances: {
                     kid1: { rewards: 0, fines: 0, totalDone: 0 },
                     kid2: { rewards: 0, fines: 0, totalDone: 0 }
@@ -671,26 +699,31 @@
 
         window.requestRoleSwitch = function(targetRole) {
             document.getElementById('profileDropdown').classList.add('hidden');
-            if (targetRole.startsWith('parent')) {
-                pendingRoleSwitch = targetRole;
-                const name = targetRole === 'parent1' ? 'Saruman' : 'Galadriel';
-                document.getElementById('targetRoleName').textContent = name;
-                document.getElementById('inputPin').value = '';
-                document.getElementById('pinError').classList.add('hidden');
-                document.getElementById('modalPin').classList.remove('hidden');
-            } else {
-                currentUserRole = targetRole;
-                updateUI();
-            }
+            pendingRoleSwitch = targetRole;
+            let name = 'Saruman';
+            if (targetRole === 'parent2') name = 'Galadriel';
+            else if (targetRole === 'kid1') name = familyState.config.kid1Name || 'Hobit Ady';
+            else if (targetRole === 'kid2') name = familyState.config.kid2Name || 'Hobit Vydra';
+
+            document.getElementById('targetRoleName').textContent = name;
+            document.getElementById('inputPin').value = '';
+            document.getElementById('pinError').classList.add('hidden');
+            document.getElementById('modalPin').classList.remove('hidden');
         };
 
         window.verifyPin = function(e) {
             e.preventDefault();
             const entered = document.getElementById('inputPin').value;
-            const correctPin = familyState.config.parentPin || '1234';
+            const target = pendingRoleSwitch || 'parent1';
+            
+            let correctPin = '1234';
+            if (target === 'parent1') correctPin = familyState.config.parentPin || '1234';
+            else if (target === 'parent2') correctPin = familyState.config.parentPin || '1234';
+            else if (target === 'kid1') correctPin = familyState.config.kid1Pin || '0000';
+            else if (target === 'kid2') correctPin = familyState.config.kid2Pin || '0000';
 
             if (entered === correctPin) {
-                currentUserRole = pendingRoleSwitch || 'parent1';
+                currentUserRole = target;
                 pendingRoleSwitch = null;
                 closeModal('modalPin');
                 updateUI();
@@ -701,26 +734,29 @@
         };
 
         window.openChangePinModal = function() {
-            document.getElementById('oldPin').value = '';
+            if (!currentUserRole.startsWith('parent')) return;
             document.getElementById('newPin').value = '';
-            document.getElementById('changePinError').classList.add('hidden');
             document.getElementById('modalChangePin').classList.remove('hidden');
         };
 
         window.handleChangePin = function(e) {
             e.preventDefault();
-            const oldP = document.getElementById('oldPin').value;
-            const newP = document.getElementById('newPin').value;
-            const currentPin = familyState.config.parentPin || '1234';
+            if (!currentUserRole.startsWith('parent')) return;
 
-            if (oldP !== currentPin) {
-                document.getElementById('changePinError').classList.remove('hidden');
-                return;
+            const targetRole = document.getElementById('pinTargetRole').value;
+            const newP = document.getElementById('newPin').value;
+
+            if (targetRole.startsWith('parent')) {
+                familyState.config.parentPin = newP;
+            } else if (targetRole === 'kid1') {
+                familyState.config.kid1Pin = newP;
+            } else if (targetRole === 'kid2') {
+                familyState.config.kid2Pin = newP;
             }
 
-            familyState.config.parentPin = newP;
             saveFamilyStateToCloud(familyState);
             closeModal('modalChangePin');
+            addLog(`Změněn PIN pro profil (${targetRole})`, 'info');
         };
 
         window.openSettingsModal = function() {
@@ -756,10 +792,10 @@
             document.getElementById('optionKid2').textContent = k2Name;
 
             const isParent = currentUserRole.startsWith('parent');
-            document.getElementById('roleBadge').textContent = isParent ? 'Editor' : 'Čtení';
+            document.getElementById('roleBadge').textContent = isParent ? 'Editor' : 'Hobit';
             document.getElementById('roleBadge').className = isParent 
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase' 
-                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase';
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase' 
+                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase';
 
             let roleName = 'Saruman';
             let roleIcon = '<i class="fa-solid fa-hat-wizard text-amber-400"></i>';
@@ -769,7 +805,7 @@
                 roleIcon = '<i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>';
             } else if (currentUserRole === 'kid1') {
                 roleName = k1Name;
-                roleIcon = '<svg class="w-5 h-5 inline-block text-emerald-400 fill-current" viewBox="0 0 24 24"><path d="M6 2v20h2.5v-7.5l7.5-5.5-7.5-2.5V2zm2.5 4.5l4.5 1.5-4.5 3V6.5zm0 8l4.5 3.3-4.5 1.7v-5z"/></svg>';
+                roleIcon = '<svg class="w-4 h-4 inline-block text-emerald-400 fill-current" viewBox="0 0 24 24"><path d="M6 2v20h2.5v-7.5l7.5-5.5-7.5-2.5V2zm2.5 4.5l4.5 1.5-4.5 3V6.5zm0 8l4.5 3.3-4.5 1.7v-5z"/></svg>';
             } else if (currentUserRole === 'kid2') {
                 roleName = k2Name;
                 roleIcon = '<i class="fa-solid fa-feather-pointed text-cyan-400"></i>';
@@ -777,13 +813,23 @@
 
             document.getElementById('currentProfileRoleIcon').innerHTML = roleIcon;
             document.getElementById('currentProfileName').textContent = roleName;
-            document.getElementById('roleBannerText').textContent = isParent ? `${roleName} (Vládce Středozemě)` : `${roleName} (Hobit z Kraje)`;
+            document.getElementById('roleBannerText').textContent = isParent ? `${roleName} (Vládce)` : `${roleName}`;
 
             const fab = document.getElementById('fabContainer');
             if (isParent && currentTab === 'tasks') {
                 fab.classList.remove('hidden');
             } else {
                 fab.classList.add('hidden');
+            }
+
+            document.getElementById('roklinkaFinanceControls').style.display = isParent ? 'block' : 'none';
+            document.getElementById('moriaEditorControls').style.display = isParent ? 'block' : 'none';
+
+            const clearBtn = document.getElementById('clearLogsBtn');
+            if (isParent && familyState.logs && familyState.logs.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
             }
 
             renderChores();
@@ -799,7 +845,6 @@
             onceList.innerHTML = '';
 
             const isParent = currentUserRole.startsWith('parent');
-
             let dailyCount = 0;
             let onceCount = 0;
 
@@ -825,10 +870,10 @@
             document.getElementById('countOnceTasks').textContent = onceCount;
 
             if (dailyCount === 0) {
-                dailyList.innerHTML = `<div class="text-center py-6 text-stone-500 text-xs italic bg-stone-900/60 rounded-xl border border-dashed border-stone-800">Žádné denní rituály v tomto zobrazení.</div>`;
+                dailyList.innerHTML = `<div class="text-center py-5 text-stone-500 text-xs italic bg-stone-900/60 rounded-xl border border-dashed border-stone-800">Žádné denní rituály.</div>`;
             }
             if (onceCount === 0) {
-                onceList.innerHTML = `<div class="text-center py-6 text-stone-500 text-xs italic bg-stone-900/60 rounded-xl border border-dashed border-stone-800">Žádné mimořádné questy.</div>`;
+                onceList.innerHTML = `<div class="text-center py-5 text-stone-500 text-xs italic bg-stone-900/60 rounded-xl border border-dashed border-stone-800">Žádné mimořádné questy.</div>`;
             }
         }
 
@@ -847,21 +892,21 @@
                 <div class="flex items-start justify-between">
                     <div class="pr-2">
                         <div class="flex items-center gap-1.5 mb-1">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${chore.assignedTo === 'both' ? 'bg-amber-950 text-amber-300 border border-amber-700/40' : 'bg-stone-800 text-stone-300'}">
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-md ${chore.assignedTo === 'both' ? 'bg-amber-950 text-amber-300 border border-amber-700/40' : 'bg-stone-800 text-stone-300'}">
                                 ${assignedText}
                             </span>
-                            ${chore.penalty > 0 ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-rose-950 text-rose-300 border border-rose-800/40">Pokuta ${chore.penalty} Kč</span>` : ''}
+                            ${chore.penalty > 0 ? `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-rose-950 text-rose-300 border border-rose-800/40">Pokuta ${chore.penalty} Kč</span>` : ''}
                         </div>
                         <h3 class="font-fantasy font-bold text-amber-300 text-sm leading-snug">${chore.title}</h3>
                         ${chore.desc ? `<p class="text-xs text-stone-400 mt-0.5">${chore.desc}</p>` : ''}
                     </div>
 
-                    <div class="text-right flex flex-col items-end">
-                        <span class="text-xs font-fantasy font-extrabold text-amber-400 bg-amber-950/80 px-2.5 py-1 rounded-xl border border-amber-600/40 shadow-inner">
+                    <div class="text-right flex flex-col items-end shrink-0">
+                        <span class="text-xs font-fantasy font-extrabold text-amber-400 bg-amber-950/80 px-2 py-1 rounded-xl border border-amber-600/40 shadow-inner">
                             +${chore.reward} Kč
                         </span>
                         ${isParent ? `
-                            <div class="flex items-center gap-2 mt-2">
+                            <div class="flex items-center gap-1.5 mt-2">
                                 <button onclick="editTask('${chore.id}')" class="text-stone-400 hover:text-amber-400 text-xs p-1" title="Upravit"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="deleteTask('${chore.id}')" class="text-stone-400 hover:text-rose-400 text-xs p-1" title="Smazat"><i class="fa-solid fa-trash"></i></button>
                             </div>
@@ -901,7 +946,7 @@
                         return `
                             <div class="flex items-center justify-between text-xs py-1">
                                 <span class="font-semibold text-stone-300 font-fantasy">${target.name}:</span>
-                                <button onclick="submitTaskForReview('${chore.id}', '${target.id}')" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm font-fantasy">
+                                <button onclick="submitTaskForReview('${chore.id}', '${target.id}')" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold px-2.5 py-1 rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm font-fantasy">
                                     <i class="fa-solid fa-check-double"></i> Splněno (Poslat)
                                 </button>
                             </div>
@@ -917,15 +962,15 @@
                 } else if (status === 'submitted') {
                     return `
                         <div class="flex items-center justify-between text-xs bg-amber-950/60 border border-amber-700/50 rounded-xl px-2.5 py-1.5">
-                            <span class="font-semibold text-amber-200">${target.name}: <span class="font-normal text-amber-300/80">Odesláno mágovi</span></span>
-                            <span class="text-[10px] bg-amber-900/80 text-amber-300 font-bold px-2 py-0.5 rounded-md border border-amber-600/30">Čeká na schválení</span>
+                            <span class="font-semibold text-amber-200">${target.name}: <span class="font-normal text-amber-300/80">Odesláno</span></span>
+                            <span class="text-[9px] bg-amber-900/80 text-amber-300 font-bold px-2 py-0.5 rounded-md border border-amber-600/30">Čeká</span>
                         </div>
                     `;
                 } else if (status === 'approved') {
                     return `
                         <div class="flex items-center justify-between text-xs bg-emerald-950/50 border border-emerald-800/40 rounded-xl px-2.5 py-1.5">
-                            <span class="font-semibold text-emerald-200">${target.name}: <span class="font-normal text-emerald-300/80">Quest Splněn!</span></span>
-                            <span class="text-[10px] bg-emerald-900/80 text-emerald-300 font-bold px-2 py-0.5 rounded-md border border-emerald-600/30"><i class="fa-solid fa-check"></i> Schváleno</span>
+                            <span class="font-semibold text-emerald-200">${target.name}: <span class="font-normal text-emerald-300/80">Splněno!</span></span>
+                            <span class="text-[9px] bg-emerald-900/80 text-emerald-300 font-bold px-2 py-0.5 rounded-md border border-emerald-600/30"><i class="fa-solid fa-check"></i> Schváleno</span>
                         </div>
                     `;
                 }
@@ -963,9 +1008,9 @@
 
             if (pendingReviews.length === 0) {
                 list.innerHTML = `
-                    <div class="text-center py-8 text-stone-500 text-xs space-y-2 bg-stone-900/40 rounded-2xl border border-stone-800">
-                        <i class="fa-solid fa-tree text-3xl text-stone-700"></i>
-                        <p>V Roklince nyní nikdo nečeká na schválení.</p>
+                    <div class="text-center py-7 text-stone-500 text-xs space-y-1.5 bg-stone-900/40 rounded-2xl border border-stone-800">
+                        <i class="fa-solid fa-tree text-2xl text-stone-700"></i>
+                        <p>V Roklince nikdo nečeká na schválení.</p>
                     </div>
                 `;
                 return;
@@ -975,22 +1020,22 @@
 
             pendingReviews.forEach(item => {
                 const div = document.createElement('div');
-                div.className = "bg-stone-900/90 border border-amber-700/60 rounded-2xl p-4 shadow-md space-y-3";
+                div.className = "bg-stone-900/90 border border-amber-700/60 rounded-2xl p-3.5 shadow-md space-y-2.5";
                 div.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div>
-                            <span class="text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded-md">
-                                Splnil hobit: ${item.kidName}
+                            <span class="text-[9px] font-bold bg-amber-950 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded-md">
+                                Hobit: ${item.kidName}
                             </span>
-                            <h3 class="font-fantasy font-bold text-amber-300 text-sm mt-1.5">${item.chore.title}</h3>
-                            <p class="text-xs text-stone-400">Odměna za quest: <strong class="text-amber-400 font-fantasy">+${item.chore.reward} Zlaťáků</strong></p>
+                            <h3 class="font-fantasy font-bold text-amber-300 text-sm mt-1">${item.chore.title}</h3>
+                            <p class="text-xs text-stone-400">Odměna: <strong class="text-amber-400 font-fantasy">+${item.chore.reward} Kč</strong></p>
                         </div>
                     </div>
 
                     ${isParent ? `
                         <div class="flex gap-2 pt-1 border-t border-stone-800">
                             <button onclick="rejectTask('${item.chore.id}', '${item.kidKey}')" class="flex-1 bg-stone-800 hover:bg-stone-700 text-rose-300 font-semibold py-2 rounded-xl text-xs flex items-center justify-center gap-1 border border-rose-900/40">
-                                <i class="fa-solid fa-xmark"></i> Vrátit quest
+                                <i class="fa-solid fa-xmark"></i> Vrátit
                             </button>
                             <button onclick="approveTask('${item.chore.id}', '${item.kidKey}')" class="flex-1 bg-amber-600 hover:bg-amber-500 text-stone-950 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1 shadow-md font-fantasy">
                                 <i class="fa-solid fa-check"></i> Schválit (+${item.chore.reward} Kč)
@@ -998,7 +1043,7 @@
                         </div>
                     ` : `
                         <div class="text-xs text-amber-300/80 bg-amber-950/40 p-2 rounded-xl text-center italic border border-amber-900/30">
-                            Čeká na posouzení Sarumanem nebo Galadriel.
+                            Čeká na posouzení mágů.
                         </div>
                     `}
                 `;
@@ -1031,14 +1076,11 @@
             document.getElementById('tableKid2Fines').textContent = `${b.kid2.fines} Kč`;
             document.getElementById('tableKid2Total').textContent = `${(b.kid2.rewards - b.kid2.fines)} Kč`;
 
-            const isParent = currentUserRole.startsWith('parent');
-            document.getElementById('parentFinanceControls').style.display = isParent ? 'block' : 'none';
-
             const logContainer = document.getElementById('historyLogs');
             logContainer.innerHTML = '';
 
             if (!familyState.logs || familyState.logs.length === 0) {
-                logContainer.innerHTML = `<p class="text-stone-500 text-xs italic">Kronika obsahuje záznamy pouze po provedeném týdenním vyúčtování.</p>`;
+                logContainer.innerHTML = `<p class="text-stone-500 text-xs italic">Kronika neobsahuje žádné záznamy.</p>`;
                 return;
             }
 
@@ -1046,11 +1088,11 @@
                 const item = document.createElement('div');
                 item.className = "bg-stone-900/80 p-2.5 rounded-xl border border-stone-800 flex items-center justify-between";
                 item.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-coins text-amber-400"></i>
+                    <div class="flex items-center gap-2 pr-2">
+                        <i class="fa-solid fa-coins text-amber-400 shrink-0"></i>
                         <span class="text-stone-300 font-medium">${log.text}</span>
                     </div>
-                    <span class="text-[10px] text-stone-500 shrink-0 ml-2 font-mono">${log.date}</span>
+                    <span class="text-[9px] text-stone-500 shrink-0 font-mono">${log.date}</span>
                 `;
                 logContainer.appendChild(item);
             });
@@ -1083,7 +1125,6 @@
             }
             if (!familyState.balances[kidKey]) familyState.balances[kidKey] = { rewards: 0, fines: 0, totalDone: 0 };
             
-            // Fixed reward accumulation
             familyState.balances[kidKey].rewards += chore.reward;
             familyState.balances[kidKey].totalDone = (familyState.balances[kidKey].totalDone || 0) + 1;
 
@@ -1179,6 +1220,7 @@
             const type = document.getElementById('manualTxType').value;
             const amount = parseInt(document.getElementById('manualTxAmount').value) || 0;
             const reason = document.getElementById('manualTxReason').value.trim();
+            const kidName = kidKey === 'kid1' ? (familyState.config.kid1Name || 'Hobit Ady') : (familyState.config.kid2Name || 'Hobit Vydra');
 
             if (!familyState.balances) {
                 familyState.balances = {
@@ -1190,8 +1232,10 @@
 
             if (type === 'bonus') {
                 familyState.balances[kidKey].rewards += amount;
+                addLog(`Bonus pro ${kidName}: +${amount} Kč (${reason})`, 'info');
             } else {
                 familyState.balances[kidKey].fines += amount;
+                addLog(`Pokuta pro ${kidName}: -${amount} Kč (${reason})`, 'warning');
             }
 
             saveFamilyStateToCloud(familyState);
@@ -1232,7 +1276,6 @@
             const p1 = (b.kid1.rewards - b.kid1.fines);
             const p2 = (b.kid2.rewards - b.kid2.fines);
 
-            // Log written ONLY upon weekly reset/payout
             addLog(`Týdenní vyúčtování: Vyplaceno ${k1Name} (${p1} Kč), ${k2Name} (${p2} Kč)`, 'info');
 
             familyState.balances = {
@@ -1246,6 +1289,14 @@
 
             saveFamilyStateToCloud(familyState);
             closeModal('modalWeeklyReset');
+        };
+
+        window.clearLogs = function() {
+            if (!currentUserRole.startsWith('parent')) return;
+            if (confirm('Opravdu chcete vymazat celou Kroniku Středozemě?')) {
+                familyState.logs = [];
+                saveFamilyStateToCloud(familyState);
+            }
         };
 
         function addLog(text, type = 'info') {
